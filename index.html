@@ -180,7 +180,7 @@
     const S = {
         cfg: CONFIG.normal, phase:'menu', running:false, paused:false,
         cells:[], correctId:null, gridPos:[], tStart:0, tPhase:0, tShuffle:0,
-        orbitAngle:0, particles:[], stars:[], scanY:0, shake:0, scanLines:[],
+        orbitAngle:0, particles:[], stars:[], scanY:0, shake:0,
         animId:null, swapTimer:null, boardRX:0, boardRY:0,
         clouds:[], skulls:[], lavaDrops:[], snowflakes:[], treePos:[], fireSpots:[]
     };
@@ -214,45 +214,37 @@
             S.cells[i].w=S.gridPos[i].w; S.cells[i].h=S.gridPos[i].h; 
         }
         
-        // Звёзды для normal
         S.stars=[];
         for(let i=0; i<120; i++) S.stars.push({
             x:Math.random()*W, y:Math.random()*H, r:Math.random()*2.5+0.3, 
             a:Math.random()*0.9+0.1, sp:Math.random()*0.04+0.003, ph:Math.random()*Math.PI*2
         });
 
-        // Облака
         S.clouds = [];
         for(let i=0; i<6; i++) S.clouds.push({
             x:Math.random()*W, y:20+Math.random()*H*0.25,
             w:60+Math.random()*120, h:20+Math.random()*30, sp:0.15+Math.random()*0.3
         });
 
-        // Черепа
         S.skulls = [];
         for(let i=0; i<10; i++) S.skulls.push({
             x:Math.random()*W, y:Math.random()*H,
             size:20+Math.random()*45, sp:0.005+Math.random()*0.03, ph:Math.random()*Math.PI*2
         });
 
-        // Лава
         S.lavaDrops = [];
         for(let i=0; i<30; i++) S.lavaDrops.push({
             x:Math.random()*W, y:H*0.5+Math.random()*H*0.5,
             r:2+Math.random()*7, sp:0.3+Math.random()*2.5, life:Math.random()*100
         });
 
-        // Снежинки
         S.snowflakes = [];
         for(let i=0; i<40; i++) S.snowflakes.push({
             x:Math.random()*W, y:Math.random()*H,
             r:1+Math.random()*3, sp:0.2+Math.random()*0.8, wind:(Math.random()-0.5)*0.4
         });
 
-        // Деревья
         S.treePos = [0.12, 0.28, 0.44, 0.6, 0.76, 0.92];
-
-        // Огонь
         S.fireSpots = [];
         for(let i=0; i<14; i++) S.fireSpots.push({x:(W/14)*i, ph:Math.random()*Math.PI*2});
     }
@@ -302,7 +294,9 @@
         gameStarted = true;
         
         S.cfg = CONFIG[mode];
-        theme = THEMES[mode]; // ВАЖНО: обновляем тему здесь!
+        theme = THEMES[mode]; // ← смена темы
+        console.log('🎨 Theme changed to:', mode, theme);
+        
         S.phase = 'reveal'; S.running = true; S.paused = false;
         S.particles = []; S.shake = 0; S.scanY = 0; S.orbitAngle = 0;
         clearTimeout(S.swapTimer);
@@ -314,7 +308,6 @@
         S.tStart = performance.now(); S.tPhase = S.tStart;
         menuOverlay.classList.add('hidden');
         
-        // Запуск аудио
         if (audioReady) {
             bgm.currentTime = 185; bgm.volume = 0.55;
             bgm.play().catch(() => {});
@@ -410,9 +403,10 @@
         }
     }
 
-    // ========== ОТРИСОВКА ПО ТЕМАМ ==========
+    // ========== ОТРИСОВКА ПО ТЕМАМ С ЛОГОМ ==========
     function drawBackground(now) {
         const mode = S.cfg.name;
+        console.log('🎨 drawBackground mode:', mode); // ← лог каждый кадр (может быть много, потом уберём)
         if (mode === 'easy') drawMountainLandscape(now);
         else if (mode === 'limbo') drawHellscape(now);
         else drawCyberpunkBg(now);
@@ -655,8 +649,7 @@
         menuOverlay.classList.remove('hidden');
         setStatus('SYS:// OFFLINE','TIME:// 0.0s','LIMBO');
         canvas.style.transform = 'translate(0,0)';
-        // Сбрасываем тему на normal для меню
-        theme = THEMES.normal;
+        theme = THEMES.normal; // сброс для меню
     }
 
     resize();
