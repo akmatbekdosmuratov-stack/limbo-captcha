@@ -99,8 +99,13 @@
         cells:[], correctId:null, gridPos:[], tStart:0, tPhase:0, tShuffle:0,
         orbitAngle:0, particles:[], shake:0,
         animId:null, swapTimer:null, boardRX:0, boardRY:0,
-        clouds:[], birds:[], snowflakes:[], mountains:[], trees:[], lake:{},
+        // Элементы для всех тем
+        clouds:[], birds:[],
+        // Для горного пейзажа
+        mountains:[], trees:[], wildflowers:[], river:{}, rocks:[], bushes:[],
+        // Киберпанк
         neonSigns:[], rainDrops:[], puddles:[],
+        // Преисподняя
         lavaRivers:[], embers:[], skulls:[], ruins:[], smokeParticles:[]
     };
 
@@ -125,16 +130,40 @@
         S.boardRY = Math.min(W,H)*0.22;
         if(S.cells.length) for(let i=0; i<S.cells.length; i++) { S.cells[i].w=S.gridPos[i].w; S.cells[i].h=S.gridPos[i].h; }
 
+        // Облака и птицы (для всех)
+        S.clouds = Array.from({length:8}, () => ({x:Math.random()*W, y:20+Math.random()*H*0.25, w:80+Math.random()*140, sp:0.2+Math.random()*0.4}));
+        S.birds = Array.from({length:6}, () => ({x:Math.random()*W, y:30+Math.random()*H*0.2, sp:0.4+Math.random()*0.8, wing:Math.random()*Math.PI*2}));
+
+        // === ГОРНЫЙ ПЕЙЗАЖ ===
         S.mountains = [
-            {x:W*0.1, w:W*0.45, h:H*0.35, color:'#4a6741'},
-            {x:W*0.5, w:W*0.5, h:H*0.4, color:'#3a5535'},
-            {x:W*0.85, w:W*0.4, h:H*0.32, color:'#4a6741'}
+            {x:W*0.1, w:W*0.45, h:H*0.35, color:'#4a6741', snow:0.25},
+            {x:W*0.5, w:W*0.5, h:H*0.4, color:'#3a5535', snow:0.3},
+            {x:W*0.85, w:W*0.4, h:H*0.32, color:'#4a6741', snow:0.2}
         ];
-        S.lake = {x:W*0.2, y:H*0.68, w:W*0.6, h:H*0.12};
-        S.clouds = Array.from({length:8}, () => ({x:Math.random()*W, y:20+Math.random()*H*0.3, w:80+Math.random()*140, sp:0.3+Math.random()*0.6}));
-        S.birds = Array.from({length:5}, () => ({x:Math.random()*W, y:30+Math.random()*H*0.2, sp:0.4+Math.random()*0.8, wing:Math.random()*Math.PI*2}));
-        S.snowflakes = Array.from({length:60}, () => ({x:Math.random()*W, y:Math.random()*H, r:1+Math.random()*3, sp:0.3+Math.random()*0.9, wind:(Math.random()-0.5)*0.5}));
-        S.trees = Array.from({length:15}, () => ({x:Math.random()*W, y:H*0.65+Math.random()*H*0.3, s:0.6+Math.random()*0.8}));
+        S.river = {
+            points: [],
+            // Генерация извилистой реки
+            init() {
+                this.points = [];
+                let x = W*0.2, y = H*0.65;
+                for (let i=0; i<20; i++) {
+                    this.points.push({x, y});
+                    x += (W*0.6/20) + (Math.random()-0.5)*30;
+                    y += (H*0.25/20) + (Math.random()-0.5)*15;
+                }
+            }
+        };
+        S.river.init();
+        S.trees = Array.from({length:12}, () => ({x:Math.random()*W, y:H*0.6+Math.random()*H*0.3, s:0.6+Math.random()*0.8}));
+        S.wildflowers = Array.from({length:40}, () => ({
+            x:Math.random()*W, y:H*0.65+Math.random()*H*0.3,
+            size:2+Math.random()*5,
+            color: `hsl(${Math.random()*60+20}, 80%, 60%)`
+        }));
+        S.rocks = Array.from({length:8}, () => ({x:Math.random()*W, y:H*0.7+Math.random()*H*0.25, r:4+Math.random()*8}));
+        S.bushes = Array.from({length:10}, () => ({x:Math.random()*W, y:H*0.68+Math.random()*H*0.28, r:6+Math.random()*12}));
+
+        // Киберпанк и преисподняя (без изменений)
         S.neonSigns = Array.from({length:5}, () => ({x:Math.random()*W, y:20+Math.random()*H*0.5, text:['HOTEL','BAR','OPEN','24H','DATA'][Math.floor(Math.random()*5)], hue:Math.random()*360}));
         S.rainDrops = Array.from({length:150}, () => ({x:Math.random()*W, y:Math.random()*H, sp:8+Math.random()*15, len:10+Math.random()*20}));
         S.puddles = Array.from({length:8}, () => ({x:Math.random()*W, y:H*0.7+Math.random()*H*0.25, w:40+Math.random()*100, h:6+Math.random()*10}));
@@ -185,7 +214,6 @@
         canvas.style.transform = 'translate(0,0)';
     }
 
-    // Игровая логика (без изменений)
     function scheduleSwap() {
         if(S.phase!=='shuffle') return;
         const now=performance.now();
@@ -272,7 +300,6 @@
         }
     }
 
-    // Отрисовка фонов с защитой
     function drawBackground(now) {
         if (!S.cfg || !S.cfg.name) return;
         try {
@@ -285,31 +312,110 @@
         }
     }
 
+    // === НОВЫЙ РЕАЛИСТИЧНЫЙ ГОРНЫЙ ПЕЙЗАЖ ===
     function drawAlpine(now) {
-        // небо
-        const grad = ctx.createLinearGradient(0,0,0,H);
-        grad.addColorStop(0,'#1a3a5c'); grad.addColorStop(0.5,'#4a7c9b'); grad.addColorStop(1,'#a3c9e0');
-        ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
-        // солнце
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(W*0.8, H*0.25, 30, 0, Math.PI*2); ctx.fill();
-        // горы
-        if (S.mountains) S.mountains.forEach(m => {
-            ctx.fillStyle = m.color;
-            ctx.beginPath(); ctx.moveTo(m.x-m.w/2, H*0.7); ctx.lineTo(m.x, H*0.7-m.h); ctx.lineTo(m.x+m.w/2, H*0.7); ctx.closePath(); ctx.fill();
-        });
-        // озеро
-        if (S.lake) {
-            ctx.fillStyle = '#2c5f8a'; ctx.fillRect(S.lake.x, S.lake.y, S.lake.w, S.lake.h);
-            ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fillRect(S.lake.x, S.lake.y, S.lake.w, S.lake.h*0.3);
+        // Небо с золотистым оттенком
+        const skyGrad = ctx.createLinearGradient(0,0,0,H);
+        skyGrad.addColorStop(0,'#3a6186');
+        skyGrad.addColorStop(0.4,'#89aed0');
+        skyGrad.addColorStop(0.8,'#f7e8c0');
+        skyGrad.addColorStop(1,'#e0c982');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0,0,W,H);
+
+        // Солнце с лучами
+        const sunX = W*0.8, sunY = H*0.25;
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        for (let i=0; i<12; i++) {
+            const angle = i*Math.PI/6;
+            const dx = Math.cos(angle)*60, dy = Math.sin(angle)*60;
+            ctx.beginPath();
+            ctx.moveTo(sunX+dx*0.3, sunY+dy*0.3);
+            ctx.lineTo(sunX+dx, sunY+dy);
+            ctx.strokeStyle = '#fff9c4';
+            ctx.lineWidth = 4;
+            ctx.stroke();
         }
-        // облака
-        if (S.clouds) S.clouds.forEach(c => { c.x += c.sp; if(c.x > W+200) c.x = -200; ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.ellipse(c.x, c.y, c.w/2, c.h/2,0,0,Math.PI*2); ctx.fill(); });
-        // птицы
-        if (S.birds) S.birds.forEach(b => { b.x += b.sp; if(b.x>W+50) b.x=-50; b.wing+=0.08; const wy=Math.sin(b.wing)*5; ctx.strokeStyle='#222'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(b.x-8,b.y-wy); ctx.quadraticCurveTo(b.x-4,b.y-8,b.x,b.y); ctx.quadraticCurveTo(b.x+4,b.y-8,b.x+8,b.y-wy); ctx.stroke(); });
-        // снежинки
-        if (S.snowflakes) S.snowflakes.forEach(sf => { sf.y+=sf.sp; sf.x+=sf.wind; if(sf.y>H+10){sf.y=-10; sf.x=Math.random()*W;} ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(sf.x,sf.y,sf.r,0,Math.PI*2); ctx.fill(); });
-        // деревья
-        if (S.trees) S.trees.forEach(t => { ctx.fillStyle='#4a3728'; ctx.fillRect(t.x-4, t.y-40*t.s, 8, 40*t.s); ctx.fillStyle='#1e4d1e'; ctx.beginPath(); ctx.moveTo(t.x, t.y-70*t.s); ctx.lineTo(t.x-20*t.s, t.y-20*t.s); ctx.lineTo(t.x+20*t.s, t.y-20*t.s); ctx.closePath(); ctx.fill(); });
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#fffde7';
+        ctx.beginPath(); ctx.arc(sunX, sunY, 25, 0, Math.PI*2); ctx.fill();
+
+        // Горы
+        if (S.mountains) S.mountains.forEach(m => {
+            // тело горы
+            ctx.fillStyle = m.color;
+            ctx.beginPath(); ctx.moveTo(m.x-m.w/2, H*0.65); ctx.lineTo(m.x, H*0.65-m.h); ctx.lineTo(m.x+m.w/2, H*0.65); ctx.closePath(); ctx.fill();
+            // снежная шапка
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.beginPath(); ctx.moveTo(m.x-m.w*0.12, H*0.65-m.h*0.75); ctx.lineTo(m.x, H*0.65-m.h); ctx.lineTo(m.x+m.w*0.12, H*0.65-m.h*0.75); ctx.closePath(); ctx.fill();
+            // туман у подножия
+            ctx.fillStyle = 'rgba(200,210,220,0.18)';
+            ctx.fillRect(m.x-m.w/2, H*0.65-20, m.w, 40);
+        });
+
+        // Река
+        if (S.river && S.river.points.length) {
+            ctx.beginPath();
+            ctx.moveTo(S.river.points[0].x, S.river.points[0].y);
+            for (let i=1; i<S.river.points.length; i++) {
+                ctx.lineTo(S.river.points[i].x, S.river.points[i].y);
+            }
+            ctx.strokeStyle = '#5b9bd5';
+            ctx.lineWidth = 18;
+            ctx.stroke();
+            // отражение неба
+            ctx.strokeStyle = 'rgba(180,210,240,0.4)';
+            ctx.lineWidth = 22;
+            ctx.stroke();
+        }
+
+        // Поляна с цветами
+        if (S.wildflowers) S.wildflowers.forEach(f => {
+            ctx.fillStyle = f.color;
+            ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(f.x, f.y, f.size*0.4, 0, Math.PI*2); ctx.fill();
+        });
+
+        // Камни
+        if (S.rocks) S.rocks.forEach(r => {
+            ctx.fillStyle = '#7a8a7a';
+            ctx.beginPath(); ctx.ellipse(r.x, r.y, r.r, r.r*0.7, 0.2, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#9eae9e';
+            ctx.beginPath(); ctx.ellipse(r.x-1, r.y-1, r.r*0.7, r.r*0.5, 0.2, 0, Math.PI*2); ctx.fill();
+        });
+
+        // Кустарники
+        if (S.bushes) S.bushes.forEach(b => {
+            ctx.fillStyle = '#2e5a1e';
+            ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#4a7a3a';
+            ctx.beginPath(); ctx.arc(b.x+2, b.y-2, b.r*0.8, 0, Math.PI*2); ctx.fill();
+        });
+
+        // Облака
+        if (S.clouds) S.clouds.forEach(c => {
+            c.x += c.sp;
+            if(c.x > W+200) c.x = -200;
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.beginPath(); ctx.ellipse(c.x, c.y, c.w/2, c.h/2, 0, 0, Math.PI*2); ctx.fill();
+        });
+
+        // Птицы
+        if (S.birds) S.birds.forEach(b => {
+            b.x += b.sp;
+            if(b.x>W+50) b.x=-50;
+            b.wing+=0.08;
+            const wy = Math.sin(b.wing)*6;
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(b.x-8, b.y-wy);
+            ctx.quadraticCurveTo(b.x-4, b.y-8, b.x, b.y);
+            ctx.quadraticCurveTo(b.x+4, b.y-8, b.x+8, b.y-wy);
+            ctx.stroke();
+        });
     }
 
     function drawCyberpunk(now) {
