@@ -146,13 +146,13 @@
 
     const THEMES = {
         easy: {
-            skyTop:'#4a90d9', skyBottom:'#87ceeb', groundColor:'#3a7d32',
+            skyTop:'#4a90d9', skyBottom:'#87ceeb', groundColor:'#4a7c3f',
             sunColor:'#ffdd57',
             mountains:[
-                {color:'#2d5a27', peak:0.45, width:0.5, offset:0.1},
-                {color:'#3a7d32', peak:0.55, width:0.6, offset:0.4},
-                {color:'#1e4018', peak:0.4, width:0.7, offset:0.7},
-                {color:'#4a9e3f', peak:0.5, width:0.4, offset:0.0}
+                {color:'#3b5e2b', peak:0.48, width:0.55, offset:0.15},
+                {color:'#2d4a1e', peak:0.58, width:0.65, offset:0.42},
+                {color:'#4a7c3f', peak:0.42, width:0.7, offset:0.72},
+                {color:'#5a8f4a', peak:0.52, width:0.45, offset:0.0}
             ],
             cellBg:'rgba(255,255,255,0.15)', cellEdge:'rgba(255,255,255,0.8)',
             correctBg:'rgba(76,175,80,0.5)', correctEdge:'#4CAF50',
@@ -182,7 +182,9 @@
         cells:[], correctId:null, gridPos:[], tStart:0, tPhase:0, tShuffle:0,
         orbitAngle:0, particles:[], stars:[], scanY:0, shake:0,
         animId:null, swapTimer:null, boardRX:0, boardRY:0,
-        clouds:[], skulls:[], lavaDrops:[], snowflakes:[], treePos:[], fireSpots:[]
+        clouds:[], snowflakes:[], treePos:[], bushPos:[],
+        birds:[], flowers:[],
+        skulls:[], lavaDrops:[], fireSpots:[], ashParticles:[], eyes:[], chains:[]
     };
 
     btnEasy.addEventListener('click', (e) => { e.stopPropagation(); startGame('easy'); });
@@ -214,39 +216,65 @@
             S.cells[i].w=S.gridPos[i].w; S.cells[i].h=S.gridPos[i].h; 
         }
         
-        S.stars=[];
-        for(let i=0; i<120; i++) S.stars.push({
-            x:Math.random()*W, y:Math.random()*H, r:Math.random()*2.5+0.3, 
+        S.stars = Array.from({length:120}, () => ({
+            x:Math.random()*W, y:Math.random()*H, r:Math.random()*2.5+0.3,
             a:Math.random()*0.9+0.1, sp:Math.random()*0.04+0.003, ph:Math.random()*Math.PI*2
-        });
+        }));
 
-        S.clouds = [];
-        for(let i=0; i<6; i++) S.clouds.push({
+        S.clouds = Array.from({length:7}, () => ({
+            x:Math.random()*W, y:20+Math.random()*H*0.3,
+            w:70+Math.random()*130, h:25+Math.random()*35, sp:0.2+Math.random()*0.4
+        }));
+
+        S.snowflakes = Array.from({length:40}, () => ({
+            x:Math.random()*W, y:Math.random()*H,
+            r:1+Math.random()*3, sp:0.2+Math.random()*0.8, wind:(Math.random()-0.5)*0.3
+        }));
+
+        S.treePos = [0.1, 0.22, 0.35, 0.48, 0.62, 0.75, 0.88];
+        S.bushPos = Array.from({length:12}, () => ({
+            x:Math.random()*W, y:H*0.6+Math.random()*H*0.3, r:6+Math.random()*12
+        }));
+
+        S.birds = Array.from({length:6}, () => ({
             x:Math.random()*W, y:20+Math.random()*H*0.25,
-            w:60+Math.random()*120, h:20+Math.random()*30, sp:0.15+Math.random()*0.3
-        });
+            sp:0.3+Math.random()*0.6, wingPhase:Math.random()*Math.PI*2
+        }));
 
-        S.skulls = [];
-        for(let i=0; i<10; i++) S.skulls.push({
+        S.flowers = Array.from({length:20}, () => ({
+            x:Math.random()*W, y:H*0.65+Math.random()*H*0.3,
+            size:3+Math.random()*6, color:`hsl(${30+Math.random()*30}, 80%, ${50+Math.random()*30}%)`
+        }));
+
+        // Hellscape elements
+        S.skulls = Array.from({length:10}, () => ({
             x:Math.random()*W, y:Math.random()*H,
-            size:20+Math.random()*45, sp:0.005+Math.random()*0.03, ph:Math.random()*Math.PI*2
-        });
+            size:24+Math.random()*45, sp:0.005+Math.random()*0.03, ph:Math.random()*Math.PI*2
+        }));
 
-        S.lavaDrops = [];
-        for(let i=0; i<30; i++) S.lavaDrops.push({
+        S.lavaDrops = Array.from({length:35}, () => ({
             x:Math.random()*W, y:H*0.5+Math.random()*H*0.5,
-            r:2+Math.random()*7, sp:0.3+Math.random()*2.5, life:Math.random()*100
-        });
+            r:3+Math.random()*8, sp:0.4+Math.random()*3, life:Math.random()*100
+        }));
 
-        S.snowflakes = [];
-        for(let i=0; i<40; i++) S.snowflakes.push({
+        S.fireSpots = Array.from({length:16}, (_,i) => ({
+            x:(W/16)*i, ph:Math.random()*Math.PI*2
+        }));
+
+        S.ashParticles = Array.from({length:50}, () => ({
             x:Math.random()*W, y:Math.random()*H,
-            r:1+Math.random()*3, sp:0.2+Math.random()*0.8, wind:(Math.random()-0.5)*0.4
-        });
+            r:1+Math.random()*3, sp:0.2+Math.random()*0.8, wind:(Math.random()-0.5)*0.5
+        }));
 
-        S.treePos = [0.12, 0.28, 0.44, 0.6, 0.76, 0.92];
-        S.fireSpots = [];
-        for(let i=0; i<14; i++) S.fireSpots.push({x:(W/14)*i, ph:Math.random()*Math.PI*2});
+        S.eyes = Array.from({length:8}, () => ({
+            x:Math.random()*W, y:Math.random()*H*0.7,
+            r:3+Math.random()*5, alpha:0.3+Math.random()*0.5
+        }));
+
+        S.chains = Array.from({length:5}, () => ({
+            x:Math.random()*W, y:0, links:8+Math.floor(Math.random()*10),
+            linkSize:6+Math.random()*8, sway:Math.random()*Math.PI*2
+        }));
     }
     window.addEventListener('resize', resize);
 
@@ -294,9 +322,7 @@
         gameStarted = true;
         
         S.cfg = CONFIG[mode];
-        theme = THEMES[mode]; // ← смена темы
-        console.log('🎨 Theme changed to:', mode, theme);
-        
+        theme = THEMES[mode];
         S.phase = 'reveal'; S.running = true; S.paused = false;
         S.particles = []; S.shake = 0; S.scanY = 0; S.orbitAngle = 0;
         clearTimeout(S.swapTimer);
@@ -314,7 +340,8 @@
         }
         
         setStatus('SYS:// ONLINE','TIME:// 0.0s','ЗАПОМНИ ЯЧЕЙКУ');
-        if(!S.animId) S.animId = requestAnimationFrame(loop);
+        cancelAnimationFrame(S.animId);
+        S.animId = requestAnimationFrame(loop);
     }
 
     function scheduleSwap() {
@@ -403,129 +430,224 @@
         }
     }
 
-    // ========== ОТРИСОВКА ПО ТЕМАМ С ЛОГОМ ==========
+    // ========== ОТРИСОВКА ФОНОВ С НОВЫМИ ДЕТАЛЯМИ ==========
     function drawBackground(now) {
         const mode = S.cfg.name;
-        console.log('🎨 drawBackground mode:', mode); // ← лог каждый кадр (может быть много, потом уберём)
         if (mode === 'easy') drawMountainLandscape(now);
         else if (mode === 'limbo') drawHellscape(now);
         else drawCyberpunkBg(now);
     }
 
     function drawMountainLandscape(now) {
+        // Небо
         const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
         skyGrad.addColorStop(0, theme.skyTop);
-        skyGrad.addColorStop(0.6, theme.skyBottom);
-        skyGrad.addColorStop(1, theme.groundColor);
+        skyGrad.addColorStop(0.65, theme.skyBottom);
+        skyGrad.addColorStop(1, '#c8e6c9');
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, W, H);
 
-        const sunX = W*0.75, sunY = H*0.18;
-        const sunGrad = ctx.createRadialGradient(sunX, sunY, 15, sunX, sunY, 90);
+        // Солнце
+        const sunX = W*0.78, sunY = H*0.16;
+        const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 100);
         sunGrad.addColorStop(0, '#fff');
-        sunGrad.addColorStop(0.2, theme.sunColor);
+        sunGrad.addColorStop(0.15, theme.sunColor);
         sunGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = sunGrad;
-        ctx.beginPath(); ctx.arc(sunX, sunY, 90, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(sunX, sunY, 100, 0, Math.PI*2); ctx.fill();
 
-        const baseY = H*0.58;
-        if(theme.mountains) {
-            for(const m of theme.mountains) {
-                const px = W*m.offset, pw = W*m.width, ph = H*m.peak;
-                ctx.fillStyle = m.color;
-                ctx.beginPath();
-                ctx.moveTo(px-pw/2, baseY);
-                ctx.lineTo(px, baseY-ph);
-                ctx.lineTo(px+pw/2, baseY);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.beginPath();
-                ctx.moveTo(px-pw*0.1, baseY-ph*0.7);
-                ctx.lineTo(px, baseY-ph);
-                ctx.lineTo(px+pw*0.1, baseY-ph*0.7);
-                ctx.closePath();
-                ctx.fill();
-            }
+        // Горы
+        const baseY = H*0.6;
+        for(const m of theme.mountains) {
+            const px = W*m.offset, pw = W*m.width, ph = H*m.peak;
+            ctx.fillStyle = m.color;
+            ctx.beginPath();
+            ctx.moveTo(px-pw/2, baseY);
+            ctx.lineTo(px, baseY-ph);
+            ctx.lineTo(px+pw/2, baseY);
+            ctx.closePath();
+            ctx.fill();
+            // Снежные шапки
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.beginPath();
+            ctx.moveTo(px-pw*0.12, baseY-ph*0.72);
+            ctx.lineTo(px, baseY-ph);
+            ctx.lineTo(px+pw*0.12, baseY-ph*0.72);
+            ctx.closePath();
+            ctx.fill();
         }
 
-        ctx.fillStyle = theme.groundColor;
+        // Земля
+        const groundGrad = ctx.createLinearGradient(0, baseY, 0, H);
+        groundGrad.addColorStop(0, theme.groundColor);
+        groundGrad.addColorStop(1, '#2e4a1e');
+        ctx.fillStyle = groundGrad;
         ctx.fillRect(0, baseY, W, H-baseY);
 
+        // Река
+        ctx.beginPath();
+        ctx.moveTo(W*0.3, baseY);
+        ctx.bezierCurveTo(W*0.35, baseY+30, W*0.25, H-80, W*0.2, H);
+        ctx.lineTo(W*0.25, H);
+        ctx.bezierCurveTo(W*0.3, H-80, W*0.4, baseY+30, W*0.35, baseY);
+        ctx.closePath();
+        const riverGrad = ctx.createLinearGradient(0, baseY, 0, H);
+        riverGrad.addColorStop(0, '#4fc3f7');
+        riverGrad.addColorStop(1, '#0277bd');
+        ctx.fillStyle = riverGrad;
+        ctx.fill();
+
+        // Облака
         for(const cl of S.clouds) {
             cl.x += cl.sp;
             if(cl.x > W+200) cl.x = -200;
-            ctx.fillStyle = 'rgba(255,255,255,0.75)';
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
             ctx.beginPath(); ctx.ellipse(cl.x, cl.y, cl.w/2, cl.h/2, 0, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse(cl.x-cl.w*0.25, cl.y-cl.h*0.2, cl.w*0.35, cl.h*0.4, 0, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse(cl.x+cl.w*0.25, cl.y-cl.h*0.15, cl.w*0.3, cl.h*0.35, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cl.x-cl.w*0.3, cl.y-cl.h*0.2, cl.w*0.35, cl.h*0.45, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cl.x+cl.w*0.3, cl.y-cl.h*0.1, cl.w*0.3, cl.h*0.4, 0, 0, Math.PI*2); ctx.fill();
         }
 
+        // Птицы
+        for(const bird of S.birds) {
+            bird.x += bird.sp;
+            if(bird.x > W+50) bird.x = -50;
+            bird.wingPhase += 0.08;
+            const wingY = Math.sin(bird.wingPhase)*5;
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(bird.x-8, bird.y-wingY);
+            ctx.quadraticCurveTo(bird.x-4, bird.y-8, bird.x, bird.y);
+            ctx.quadraticCurveTo(bird.x+4, bird.y-8, bird.x+8, bird.y-wingY);
+            ctx.stroke();
+        }
+
+        // Снежинки
         for(const sf of S.snowflakes) {
             sf.y += sf.sp; sf.x += sf.wind;
             if(sf.y > H+10) { sf.y = -10; sf.x = Math.random()*W; }
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
             ctx.beginPath(); ctx.arc(sf.x, sf.y, sf.r, 0, Math.PI*2); ctx.fill();
         }
 
+        // Деревья
         for(const tx of S.treePos) {
             const treeX = W*tx, treeY = baseY;
             ctx.fillStyle = '#4a3728';
-            ctx.fillRect(treeX-4, treeY-45, 8, 45);
-            ctx.fillStyle = '#2d5a27';
-            ctx.beginPath(); ctx.moveTo(treeX, treeY-75); ctx.lineTo(treeX-22, treeY-25); ctx.lineTo(treeX+22, treeY-25); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = '#3a7d32';
-            ctx.beginPath(); ctx.moveTo(treeX, treeY-60); ctx.lineTo(treeX-18, treeY-18); ctx.lineTo(treeX+18, treeY-18); ctx.closePath(); ctx.fill();
+            ctx.fillRect(treeX-5, treeY-50, 10, 50);
+            ctx.fillStyle = '#1e4d1e';
+            ctx.beginPath(); ctx.moveTo(treeX, treeY-85); ctx.lineTo(treeX-28, treeY-30); ctx.lineTo(treeX+28, treeY-30); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#2d6b2d';
+            ctx.beginPath(); ctx.moveTo(treeX, treeY-65); ctx.lineTo(treeX-22, treeY-20); ctx.lineTo(treeX+22, treeY-20); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#3a8030';
+            ctx.beginPath(); ctx.moveTo(treeX, treeY-45); ctx.lineTo(treeX-16, treeY-10); ctx.lineTo(treeX+16, treeY-10); ctx.closePath(); ctx.fill();
+        }
+
+        // Кусты
+        for(const bush of S.bushPos) {
+            ctx.fillStyle = '#3a6b30';
+            ctx.beginPath(); ctx.arc(bush.x, bush.y, bush.r, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#4a8c3f';
+            ctx.beginPath(); ctx.arc(bush.x-3, bush.y-2, bush.r*0.7, 0, Math.PI*2); ctx.fill();
+        }
+
+        // Цветы
+        for(const fl of S.flowers) {
+            ctx.fillStyle = fl.color;
+            ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.size/2, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#ffeb3b';
+            ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.size*0.3, 0, Math.PI*2); ctx.fill();
         }
     }
 
     function drawHellscape(now) {
-        const hellGrad = ctx.createRadialGradient(W/2, H*0.55, 0, W/2, H*0.55, Math.max(W,H));
-        hellGrad.addColorStop(0, '#2a0000'); hellGrad.addColorStop(0.6, '#1a0000'); hellGrad.addColorStop(1, '#000');
+        const hellGrad = ctx.createRadialGradient(W/2, H*0.5, 0, W/2, H*0.5, Math.max(W,H));
+        hellGrad.addColorStop(0, '#3a0000'); hellGrad.addColorStop(0.7, '#1a0000'); hellGrad.addColorStop(1, '#000');
         ctx.fillStyle = hellGrad;
         ctx.fillRect(0, 0, W, H);
 
-        ctx.strokeStyle = 'rgba(255,69,0,0.25)'; ctx.lineWidth = 2.5;
-        for(let i=0; i<6; i++) {
+        // Лавовые трещины
+        ctx.strokeStyle = 'rgba(255,80,0,0.3)'; ctx.lineWidth = 2;
+        for(let i=0; i<8; i++) {
             ctx.beginPath();
-            let lx = Math.random()*W, ly = H;
+            let lx = Math.random()*W, ly = H*0.9;
             ctx.moveTo(lx, ly);
-            for(let j=0; j<12; j++) { lx += (Math.random()-0.5)*70; ly -= 18+Math.random()*45; ctx.lineTo(lx, ly); }
+            for(let j=0; j<14; j++) { lx += (Math.random()-0.5)*80; ly -= 15+Math.random()*50; ctx.lineTo(lx, ly); }
             ctx.stroke();
         }
 
+        // Лавовые капли
         for(const ld of S.lavaDrops) {
             ld.y += ld.sp; ld.life++;
-            if(ld.life > 100 || ld.y > H+60) { ld.y = H*0.45+Math.random()*H*0.55; ld.life = 0; ld.x = Math.random()*W; }
-            const alpha = ld.life < 30 ? ld.life/30 : 1 - (ld.life-30)/70;
-            ctx.fillStyle = 'rgba(255,100,0,'+Math.max(0,alpha*0.7).toFixed(2)+')';
+            if(ld.life > 100 || ld.y > H+60) { ld.y = H*0.4+Math.random()*H*0.6; ld.life = 0; ld.x = Math.random()*W; }
+            const alpha = ld.life < 25 ? ld.life/25 : 1 - (ld.life-25)/75;
+            ctx.fillStyle = `rgba(255,120,0,${Math.max(0,alpha*0.8).toFixed(2)})`;
             ctx.beginPath(); ctx.arc(ld.x, ld.y, ld.r, 0, Math.PI*2); ctx.fill();
         }
 
+        // Черепа
         for(const sk of S.skulls) {
             sk.ph += sk.sp;
-            const alpha = 0.06 + Math.abs(Math.sin(sk.ph))*0.08;
+            const alpha = 0.05 + Math.abs(Math.sin(sk.ph))*0.08;
             ctx.save(); ctx.globalAlpha = alpha;
-            ctx.fillStyle = '#fff'; ctx.font = sk.size+'px serif';
+            ctx.fillStyle = '#ddd'; ctx.font = `${sk.size}px serif`;
             ctx.fillText('💀', sk.x, sk.y);
             ctx.restore();
         }
 
+        // Огонь
         const fireBase = H*0.88;
         for(let i=0; i<S.fireSpots.length; i++) {
             const fs = S.fireSpots[i];
-            const fh = 25+Math.abs(Math.sin(now*0.015+fs.ph))*55;
+            const fh = 30+Math.abs(Math.sin(now*0.015+fs.ph))*65;
             const fGrad = ctx.createLinearGradient(fs.x, fireBase, fs.x, fireBase-fh);
-            fGrad.addColorStop(0, 'rgba(255,0,0,0.7)');
-            fGrad.addColorStop(0.4, 'rgba(255,140,0,0.5)');
-            fGrad.addColorStop(0.8, 'rgba(255,215,0,0.2)');
+            fGrad.addColorStop(0, 'rgba(255,0,0,0.8)');
+            fGrad.addColorStop(0.3, 'rgba(255,140,0,0.6)');
+            fGrad.addColorStop(0.7, 'rgba(255,215,0,0.3)');
             fGrad.addColorStop(1, 'transparent');
             ctx.fillStyle = fGrad;
             ctx.beginPath();
-            ctx.moveTo(fs.x-10, fireBase);
-            ctx.quadraticCurveTo(fs.x-18, fireBase-fh*0.7, fs.x, fireBase-fh);
-            ctx.quadraticCurveTo(fs.x+18, fireBase-fh*0.7, fs.x+10, fireBase);
+            ctx.moveTo(fs.x-12, fireBase);
+            ctx.quadraticCurveTo(fs.x-20, fireBase-fh*0.7, fs.x, fireBase-fh);
+            ctx.quadraticCurveTo(fs.x+20, fireBase-fh*0.7, fs.x+12, fireBase);
             ctx.fill();
+        }
+
+        // Пепел
+        for(const ash of S.ashParticles) {
+            ash.y += ash.sp; ash.x += ash.wind;
+            if(ash.y > H+10) { ash.y = -10; ash.x = Math.random()*W; }
+            ctx.fillStyle = `rgba(100,100,100,0.5)`;
+            ctx.beginPath(); ctx.arc(ash.x, ash.y, ash.r, 0, Math.PI*2); ctx.fill();
+        }
+
+        // Глаза в темноте
+        for(const eye of S.eyes) {
+            const alpha = eye.alpha + Math.sin(now*0.02+eye.x)*0.1;
+            ctx.fillStyle = `rgba(255,0,0,${Math.max(0.1, alpha).toFixed(2)})`;
+            ctx.beginPath(); ctx.arc(eye.x, eye.y, eye.r, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(eye.x, eye.y, eye.r*0.4, 0, Math.PI*2); ctx.fill();
+        }
+
+        // Цепи
+        ctx.strokeStyle = 'rgba(150,150,150,0.6)'; ctx.lineWidth = 2;
+        for(const chain of S.chains) {
+            let cy = chain.y;
+            ctx.beginPath();
+            ctx.moveTo(chain.x, cy);
+            for(let i=0; i<chain.links; i++) {
+                cy += chain.linkSize;
+                ctx.lineTo(chain.x + Math.sin(i*0.8+chain.sway)*5, cy);
+            }
+            ctx.stroke();
+            // Звенья
+            ctx.fillStyle = 'rgba(180,180,180,0.5)';
+            for(let i=0; i<chain.links; i++) {
+                const linkY = chain.y + i*chain.linkSize + chain.linkSize/2;
+                const linkX = chain.x + Math.sin(i*0.8+chain.sway)*5;
+                ctx.fillRect(linkX-2, linkY-chain.linkSize*0.3, 4, chain.linkSize*0.6);
+            }
         }
     }
 
@@ -649,7 +771,8 @@
         menuOverlay.classList.remove('hidden');
         setStatus('SYS:// OFFLINE','TIME:// 0.0s','LIMBO');
         canvas.style.transform = 'translate(0,0)';
-        theme = THEMES.normal; // сброс для меню
+        theme = THEMES.normal; // меню всегда киберпанк
+        // Не отменяем цикл, он продолжит рисовать меню
     }
 
     resize();
