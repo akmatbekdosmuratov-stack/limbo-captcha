@@ -14,114 +14,56 @@
         #top,#bottom { display:flex; justify-content:space-between; align-items:center; gap:8px; }
         #bottom { align-items:flex-end; }
         .badge { 
-            padding:7px 12px; 
-            border:1px solid rgba(255,255,255,0.3); 
-            background:rgba(0,0,0,0.75); 
-            color:#fff; font-size:10px; letter-spacing:2px; 
-            text-shadow:0 0 10px rgba(255,255,255,0.5);
+            padding:7px 12px; border:1px solid rgba(255,255,255,0.3); 
+            background:rgba(0,0,0,0.75); color:#fff; font-size:10px; letter-spacing:2px; 
             clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-            backdrop-filter:blur(5px);
-            transition:all 0.5s;
         }
         #center-msg { 
             position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); 
             pointer-events:none; z-index:10; 
             color:#fff; font-size:clamp(11px,2.2vw,18px); font-weight:bold; letter-spacing:4px; text-align:center; 
-            text-shadow:0 0 20px rgba(255,255,255,0.8);
-            padding:10px 20px; 
-            border:2px solid rgba(255,255,255,0.4);
+            padding:10px 20px; border:2px solid rgba(255,255,255,0.4);
             background:rgba(0,0,0,0.7);
             clip-path: polygon(15px 0, 100% 0, calc(100% - 15px) 100%, 0 100%);
-            transition:all 0.5s;
             white-space:nowrap;
         }
-        @keyframes msgPulse {
-            0%,100% { box-shadow:0 0 20px rgba(255,255,255,0.3); }
-            50% { box-shadow:0 0 40px rgba(255,255,255,0.5); }
-        }
 
-        #menu-overlay { 
-            position:fixed; inset:0; z-index:999; 
-            display:flex; align-items:center; justify-content:center; 
-            background:radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.95) 100%);
-            transition:all 0.5s;
-        }
+        #menu-overlay { position:fixed; inset:0; z-index:999; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.9); }
         #menu-overlay.hidden { display:none !important; }
         .menu-box { 
             width:90%; max-width:500px; padding:35px 30px; 
             border:2px solid rgba(255,255,255,0.3);
-            background:rgba(10,10,20,0.95);
-            text-align:center; 
-            box-shadow:0 0 60px rgba(255,255,255,0.15);
+            background:rgba(10,10,20,0.95); text-align:center; 
             clip-path: polygon(30px 0, 100% 0, calc(100% - 30px) 100%, 0 100%);
-            position:relative;
-            transition:all 0.5s;
         }
-        .menu-box h1 { 
-            color:#fff; font-size:clamp(36px,7vw,54px); letter-spacing:15px; margin-bottom:5px;
-            text-shadow:0 0 25px rgba(255,255,255,0.8);
-            transition:all 0.5s;
-        }
-        .menu-box .sub { 
-            color:#aaa; font-size:11px; letter-spacing:8px; margin-bottom:25px; 
-            transition:all 0.5s;
-        }
-        .menu-box .divider { 
-            width:75%; height:2px; 
-            background:linear-gradient(90deg, transparent, #fff, #aaa, transparent); 
-            margin:0 auto 20px;
-            transition:all 0.5s;
-        }
+        .menu-box h1 { color:#fff; font-size:clamp(36px,7vw,54px); letter-spacing:15px; margin-bottom:5px; }
+        .menu-box .sub { color:#aaa; font-size:11px; letter-spacing:8px; margin-bottom:25px; }
+        .menu-box .divider { width:75%; height:2px; background:linear-gradient(90deg, transparent, #fff, #aaa, transparent); margin:0 auto 20px; }
         .menu-box button { 
             display:block; width:100%; padding:14px 20px; margin:8px 0; 
-            border:1px solid rgba(255,255,255,0.3); 
-            background:rgba(0,0,0,0.4); 
+            border:1px solid rgba(255,255,255,0.3); background:rgba(0,0,0,0.4); 
             color:#fff; font-family:inherit; font-size:14px; cursor:pointer; text-align:left; 
             transition:all 0.3s;
             clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
-            position:relative; z-index:1000;
-            letter-spacing:1px;
         }
-        .menu-box button:hover { 
-            background:rgba(255,255,255,0.1);
-            border-color:#fff; 
-            box-shadow:0 0 30px rgba(255,255,255,0.3);
-            transform:translateY(-3px);
-        }
+        .menu-box button:hover { background:rgba(255,255,255,0.1); border-color:#fff; transform:translateY(-3px); }
         .menu-box button b { display:block; margin-bottom:3px; color:#fff; font-size:16px; }
         .menu-box button span { display:block; font-size:10px; color:rgba(255,255,255,0.5); }
         .menu-box .hint { margin-top:22px; color:rgba(255,255,255,0.3); font-size:9px; letter-spacing:4px; }
 
-        /* Кнопка easy */
         #btn-easy { border-color:rgba(100,200,255,0.5); }
-        #btn-easy:hover { background:rgba(100,200,255,0.15); border-color:#6cf; box-shadow:0 0 30px rgba(100,200,255,0.4); }
-        /* Кнопка normal */
+        #btn-easy:hover { background:rgba(100,200,255,0.15); border-color:#6cf; }
         #btn-normal { border-color:rgba(0,255,255,0.5); }
-        #btn-normal:hover { background:rgba(0,255,255,0.15); border-color:#0ff; box-shadow:0 0 30px rgba(0,255,255,0.4); }
-        /* Кнопка limbo */
+        #btn-normal:hover { background:rgba(0,255,255,0.15); border-color:#0ff; }
         #btn-limbo { border-color:rgba(255,100,0,0.5); }
-        #btn-limbo:hover { background:rgba(255,100,0,0.15); border-color:#f60; box-shadow:0 0 30px rgba(255,100,0,0.4); }
+        #btn-limbo:hover { background:rgba(255,100,0,0.15); border-color:#f60; }
 
         .sound-btn {
             position:fixed; bottom:20px; right:20px; z-index:999;
             width:44px; height:44px; border-radius:50%;
             background:rgba(0,0,0,0.8); border:2px solid rgba(255,255,255,0.4);
             display:flex; align-items:center; justify-content:center;
-            cursor:pointer; transition:all 0.3s;
-            box-shadow:0 0 20px rgba(255,255,255,0.2);
-            pointer-events:auto;
-            font-size:20px;
-        }
-        .sound-btn:hover { border-color:#fff; box-shadow:0 0 35px rgba(255,255,255,0.5); }
-        .sound-btn.muted { border-color:rgba(255,0,64,0.6); box-shadow:0 0 20px rgba(255,0,64,0.3); }
-
-        @media (max-width:600px) { 
-            #ui { padding:6px; } 
-            #top,#bottom { flex-direction:column; gap:4px; } 
-            .badge { font-size:8px; padding:5px 8px; } 
-            #center-msg { font-size:12px; padding:8px 12px; }
-            .menu-box { padding:25px 15px; }
-            .menu-box h1 { font-size:30px; letter-spacing:8px; }
+            cursor:pointer; font-size:20px;
         }
     </style>
 </head>
@@ -179,109 +121,68 @@
     const logArea = document.getElementById('log-area');
     const bgm = document.getElementById('bgm');
     const soundBtn = document.getElementById('soundBtn');
-
     const btnEasy = document.getElementById('btn-easy');
     const btnNormal = document.getElementById('btn-normal');
     const btnLimbo = document.getElementById('btn-limbo');
 
-    let W, H;
-    let audioReady = false;
+    let W, H, audioReady = false;
 
     soundBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (bgm.paused) {
-            bgm.currentTime = bgm.currentTime || 185;
-            bgm.volume = 0.55;
-            bgm.play().then(() => {
-                soundBtn.textContent = '🔊';
-                soundBtn.classList.remove('muted');
-            }).catch(() => {});
+            bgm.currentTime = 185; bgm.volume = 0.55;
+            bgm.play().then(() => { soundBtn.textContent = '🔊'; soundBtn.classList.remove('muted'); }).catch(() => {});
         } else {
-            bgm.pause();
-            soundBtn.textContent = '🔇';
-            soundBtn.classList.add('muted');
+            bgm.pause(); soundBtn.textContent = '🔇'; soundBtn.classList.add('muted');
         }
     });
-
     bgm.addEventListener('canplaythrough', () => { audioReady = true; });
-    bgm.addEventListener('error', () => { soundBtn.style.opacity = '0.3'; });
 
     const CONFIG = {
-        easy:   { name:'ЛЁГКИЙ',    reveal:4200, shuffle:10000, beat:500, orbit:0.005, trans:2000 },
-        normal: { name:'НОРМАЛЬНЫЙ', reveal:4200, shuffle:10000, beat:350, orbit:0.008, trans:1800 },
-        limbo:  { name:'LIMBO',     reveal:4200, shuffle:10000, beat:200, orbit:0.012, trans:1500 }
+        easy:   { name:'easy',   reveal:4200, shuffle:10000, beat:500, orbit:0.005, trans:2000 },
+        normal: { name:'normal', reveal:4200, shuffle:10000, beat:350, orbit:0.008, trans:1800 },
+        limbo:  { name:'limbo',  reveal:4200, shuffle:10000, beat:200, orbit:0.012, trans:1500 }
     };
 
-    // ========== 3 УНИКАЛЬНЫЕ ТЕМЫ ==========
     const THEMES = {
-        // 🏔 ГОРНЫЙ ПЕЙЗАЖ — голубое небо, зелёные горы, солнце
         easy: {
-            bg:'#1a2a3a',
-            // Небо
-            skyTop:'#4a90d9', skyBottom:'#87ceeb',
-            // Солнце
-            sunColor:'#ffdd57', sunGlow:'rgba(255,221,87,0.4)',
-            // Горы
+            skyTop:'#4a90d9', skyBottom:'#87ceeb', groundColor:'#3a7d32',
+            sunColor:'#ffdd57',
             mountains:[
                 {color:'#2d5a27', peak:0.45, width:0.5, offset:0.1},
                 {color:'#3a7d32', peak:0.55, width:0.6, offset:0.4},
                 {color:'#1e4018', peak:0.4, width:0.7, offset:0.7},
                 {color:'#4a9e3f', peak:0.5, width:0.4, offset:0.0}
             ],
-            // Облака
-            cloudColor:'rgba(255,255,255,0.7)',
-            // Ячейки
             cellBg:'rgba(255,255,255,0.15)', cellEdge:'rgba(255,255,255,0.8)',
-            correctBg:'rgba(76,175,80,0.4)', correctEdge:'#4CAF50',
+            correctBg:'rgba(76,175,80,0.5)', correctEdge:'#4CAF50',
             wrongBg:'rgba(244,67,54,0.5)', wrongEdge:'#F44336',
-            // Эффекты
-            scanColor:'rgba(255,255,255,0.2)', ringColor:'rgba(255,255,255,0.3)',
-            starColor:'rgba(255,255,255,', hudText:'#ffffff', accent:'#FFD700',
-            // Частицы — бабочки/листья
-            particleColors:['rgba(255,255,255,','rgba(255,221,87,','rgba(144,238,144,','rgba(135,206,235,'],
-            groundColor:'#3a7d32'
+            ringColor:'rgba(255,255,255,0.4)', hudText:'#ffffff', accent:'#FFD700'
         },
-        // 💜 КИБЕРПАНК — неон, сетка, тёмные тона
         normal: {
             bg:'#020015',
             cellBg:'rgba(0,245,255,0.1)', cellEdge:'rgba(0,245,255,0.85)',
             correctBg:'rgba(57,255,20,0.4)', correctEdge:'#39FF14',
             wrongBg:'rgba(255,0,64,0.5)', wrongEdge:'#FF0040',
-            scanColor:'rgba(0,255,255,0.35)', ringColor:'rgba(0,255,255,0.45)',
-            starColor:'rgba(150,220,255,', hudText:'#00FFFF', accent:'#00FFFF',
-            particleColors:['rgba(0,255,255,','rgba(255,0,255,','rgba(57,255,20,'],
-            gridColor:'rgba(0,255,255,0.05)'
+            ringColor:'rgba(0,255,255,0.45)', hudText:'#00FFFF', accent:'#00FFFF'
         },
-        // 💀 ПРЕИСПОДНЯЯ — лава, черепа, красно-оранжевый
         limbo: {
             bg:'#1a0000',
-            // Лава
-            lavaColors:['#ff4500','#ff6347','#ff8c00','#ff0000','#ffd700'],
-            lavaGlow:'rgba(255,69,0,0.6)',
-            // Черепа (ASCII)
-            skullChar:'💀',
-            // Ячейки
             cellBg:'rgba(255,100,0,0.15)', cellEdge:'rgba(255,140,0,0.85)',
-            correctBg:'rgba(255,215,0,0.4)', correctEdge:'#FFD700',
+            correctBg:'rgba(255,215,0,0.5)', correctEdge:'#FFD700',
             wrongBg:'rgba(139,0,0,0.6)', wrongEdge:'#8B0000',
-            // Эффекты
-            scanColor:'rgba(255,69,0,0.4)', ringColor:'rgba(255,100,0,0.5)',
-            starColor:'rgba(255,160,80,', hudText:'#FF8C00', accent:'#FF4500',
-            particleColors:['rgba(255,69,0,','rgba(255,140,0,','rgba(255,215,0,','rgba(139,0,0,'],
-            emberColor:'rgba(255,100,0,0.8)'
+            ringColor:'rgba(255,100,0,0.5)', hudText:'#FF8C00', accent:'#FF4500'
         }
     };
 
-    let theme = THEMES.normal;
-    let gameStarted = false;
+    let theme = THEMES.normal, gameStarted = false;
 
     const S = {
         cfg: CONFIG.normal, phase:'menu', running:false, paused:false,
         cells:[], correctId:null, gridPos:[], tStart:0, tPhase:0, tShuffle:0,
         orbitAngle:0, particles:[], stars:[], scanY:0, shake:0, scanLines:[],
-        animId:null, swapTimer:null, boardRX:0, boardRY:0, 
-        hexagons:[], diamonds:[], triangles:[],
-        clouds:[], skulls:[], lavaDrops:[], mountains:[], snowflakes:[]
+        animId:null, swapTimer:null, boardRX:0, boardRY:0,
+        clouds:[], skulls:[], lavaDrops:[], snowflakes:[], treePos:[], fireSpots:[]
     };
 
     btnEasy.addEventListener('click', (e) => { e.stopPropagation(); startGame('easy'); });
@@ -313,53 +214,47 @@
             S.cells[i].w=S.gridPos[i].w; S.cells[i].h=S.gridPos[i].h; 
         }
         
-        if(!S.stars.length || S.stars.length<80) {
-            S.stars=[];
-            for(let i=0; i<120; i++) S.stars.push({
-                x:Math.random()*W, y:Math.random()*H, 
-                r:Math.random()*2.5+0.3, a:Math.random()*0.9+0.1, 
-                sp:Math.random()*0.04+0.003, ph:Math.random()*Math.PI*2
-            });
-        }
-        
-        // Облака для лёгкого режима
+        // Звёзды для normal
+        S.stars=[];
+        for(let i=0; i<120; i++) S.stars.push({
+            x:Math.random()*W, y:Math.random()*H, r:Math.random()*2.5+0.3, 
+            a:Math.random()*0.9+0.1, sp:Math.random()*0.04+0.003, ph:Math.random()*Math.PI*2
+        });
+
+        // Облака
         S.clouds = [];
         for(let i=0; i<6; i++) S.clouds.push({
-            x:Math.random()*W, y:20+Math.random()*H*0.3,
-            w:60+Math.random()*120, h:20+Math.random()*30,
-            sp:0.15+Math.random()*0.3
+            x:Math.random()*W, y:20+Math.random()*H*0.25,
+            w:60+Math.random()*120, h:20+Math.random()*30, sp:0.15+Math.random()*0.3
         });
 
-        // Черепа для LIMBO
+        // Черепа
         S.skulls = [];
-        for(let i=0; i<8; i++) S.skulls.push({
+        for(let i=0; i<10; i++) S.skulls.push({
             x:Math.random()*W, y:Math.random()*H,
-            size:20+Math.random()*40, sp:0.01+Math.random()*0.03,
-            ph:Math.random()*Math.PI*2, alpha:0.08+Math.random()*0.15
+            size:20+Math.random()*45, sp:0.005+Math.random()*0.03, ph:Math.random()*Math.PI*2
         });
 
-        // Лавовые капли для LIMBO
+        // Лава
         S.lavaDrops = [];
-        for(let i=0; i<25; i++) S.lavaDrops.push({
-            x:Math.random()*W, y:Math.random()*H*0.6 + H*0.4,
-            r:2+Math.random()*6, sp:0.5+Math.random()*2,
-            life:Math.random()*100, maxLife:80+Math.random()*120
+        for(let i=0; i<30; i++) S.lavaDrops.push({
+            x:Math.random()*W, y:H*0.5+Math.random()*H*0.5,
+            r:2+Math.random()*7, sp:0.3+Math.random()*2.5, life:Math.random()*100
         });
 
-        // Горы для лёгкого
-        S.mountains = [];
-        if(theme.mountains) {
-            for(const m of theme.mountains) {
-                S.mountains.push({...m});
-            }
-        }
-
+        // Снежинки
         S.snowflakes = [];
-        for(let i=0; i<30; i++) S.snowflakes.push({
+        for(let i=0; i<40; i++) S.snowflakes.push({
             x:Math.random()*W, y:Math.random()*H,
-            r:1+Math.random()*3, sp:0.3+Math.random()*0.8,
-            wind:Math.random()*0.5-0.25, alpha:0.4+Math.random()*0.5
+            r:1+Math.random()*3, sp:0.2+Math.random()*0.8, wind:(Math.random()-0.5)*0.4
         });
+
+        // Деревья
+        S.treePos = [0.12, 0.28, 0.44, 0.6, 0.76, 0.92];
+
+        // Огонь
+        S.fireSpots = [];
+        for(let i=0; i<14; i++) S.fireSpots.push({x:(W/14)*i, ph:Math.random()*Math.PI*2});
     }
     window.addEventListener('resize', resize);
 
@@ -396,46 +291,37 @@
             if(c.isCorrect && show) { c.color = theme.correctBg; c.edge = theme.correctEdge; }
             else if(!c.isCorrect || !show) { c.color = theme.cellBg; c.edge = theme.cellEdge; }
         });
-        if(!show) {
-            const correctCell = S.cells.find(c => c.isCorrect);
-            if(correctCell) { correctCell.color = theme.cellBg; correctCell.edge = theme.cellEdge; }
-        }
     }
 
     function resetCellsToGrid() {
         S.cells.forEach((c,i)=>{ const g=S.gridPos[i]; c.x=g.x; c.y=g.y; });
     }
 
-    function setupAudio() {
-        if (!audioReady) { setTimeout(setupAudio, 500); return; }
-        try {
-            bgm.currentTime = 185;
-            bgm.volume = 0.55;
-            bgm.play().then(() => {
-                soundBtn.textContent = '🔊';
-                soundBtn.classList.remove('muted');
-            }).catch(() => {
-                soundBtn.textContent = '🔇';
-                soundBtn.classList.add('muted');
-            });
-        } catch(e) {}
-    }
-
     function startGame(mode) {
         if(gameStarted) return;
         gameStarted = true;
         
-        S.cfg=CONFIG[mode]; theme=THEMES[mode]; S.phase='reveal'; S.running=true; S.paused=false;
-        S.particles=[]; S.shake=0; S.scanY=0; S.orbitAngle=0;
+        S.cfg = CONFIG[mode];
+        theme = THEMES[mode]; // ВАЖНО: обновляем тему здесь!
+        S.phase = 'reveal'; S.running = true; S.paused = false;
+        S.particles = []; S.shake = 0; S.scanY = 0; S.orbitAngle = 0;
         clearTimeout(S.swapTimer);
-        resize(); createCells(); resetCellsToGrid();
-        S.tStart=performance.now(); S.tPhase=S.tStart;
         
+        resize();
+        createCells();
+        resetCellsToGrid();
+        
+        S.tStart = performance.now(); S.tPhase = S.tStart;
         menuOverlay.classList.add('hidden');
-        setupAudio();
+        
+        // Запуск аудио
+        if (audioReady) {
+            bgm.currentTime = 185; bgm.volume = 0.55;
+            bgm.play().catch(() => {});
+        }
         
         setStatus('SYS:// ONLINE','TIME:// 0.0s','ЗАПОМНИ ЯЧЕЙКУ');
-        if(!S.animId) S.animId=requestAnimationFrame(loop);
+        if(!S.animId) S.animId = requestAnimationFrame(loop);
     }
 
     function scheduleSwap() {
@@ -511,17 +397,10 @@
 
     function spawnBurst(n) {
         const cx=W/2, cy=H/2;
-        const colors = theme.particleColors || ['rgba(255,255,255,'];
         for(let i=0; i<n; i++) {
             const a=Math.random()*Math.PI*2, s=1.5+Math.random()*5;
-            S.particles.push({x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:0,max:30+Math.random()*35,size:1.5+Math.random()*4.5,col:colors[Math.floor(Math.random()*colors.length)]});
+            S.particles.push({x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:0,max:30+Math.random()*35,size:1.5+Math.random()*4.5});
         }
-    }
-
-    function spawnAmbient() {
-        if(Math.random()>0.3) return;
-        const colors = theme.particleColors || ['rgba(255,255,255,'];
-        S.particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5,life:0,max:70+Math.random()*120,size:0.3+Math.random()*3,col:colors[Math.floor(Math.random()*colors.length)]});
     }
 
     function updateParticles() {
@@ -529,25 +408,17 @@
             const p=S.particles[i]; p.x+=p.vx; p.y+=p.vy; p.life++; p.vx*=0.992; p.vy*=0.992;
             if(p.life>=p.max) S.particles.splice(i,1);
         }
-        spawnAmbient();
     }
 
-    // ========== ОТРИСОВКА ФОНА В ЗАВИСИМОСТИ ОТ ТЕМЫ ==========
+    // ========== ОТРИСОВКА ПО ТЕМАМ ==========
     function drawBackground(now) {
-        const cfg = S.cfg;
-        
-        if (cfg.name === 'ЛЁГКИЙ') {
-            drawMountainLandscape(now);
-        } else if (cfg.name === 'LIMBO') {
-            drawHellscape(now);
-        } else {
-            drawCyberpunkBg(now);
-        }
+        const mode = S.cfg.name;
+        if (mode === 'easy') drawMountainLandscape(now);
+        else if (mode === 'limbo') drawHellscape(now);
+        else drawCyberpunkBg(now);
     }
 
-    // 🏔 ГОРНЫЙ ПЕЙЗАЖ
     function drawMountainLandscape(now) {
-        // Небо — градиент от тёмно-голубого к светло-голубому
         const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
         skyGrad.addColorStop(0, theme.skyTop);
         skyGrad.addColorStop(0.6, theme.skyBottom);
@@ -555,183 +426,131 @@
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, W, H);
 
-        // Солнце
-        const sunX = W*0.75, sunY = H*0.2;
-        const sunGrad = ctx.createRadialGradient(sunX, sunY, 20, sunX, sunY, 80);
+        const sunX = W*0.75, sunY = H*0.18;
+        const sunGrad = ctx.createRadialGradient(sunX, sunY, 15, sunX, sunY, 90);
         sunGrad.addColorStop(0, '#fff');
-        sunGrad.addColorStop(0.3, theme.sunColor);
+        sunGrad.addColorStop(0.2, theme.sunColor);
         sunGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = sunGrad;
-        ctx.beginPath(); ctx.arc(sunX, sunY, 80, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(sunX, sunY, 90, 0, Math.PI*2); ctx.fill();
 
-        // Горы
-        const baseY = H*0.55;
-        for(const m of S.mountains) {
-            const px = W*m.offset;
-            const pw = W*m.width;
-            const ph = H*m.peak;
-            ctx.fillStyle = m.color;
-            ctx.beginPath();
-            ctx.moveTo(px-pw/2, baseY);
-            ctx.lineTo(px, baseY-ph);
-            ctx.lineTo(px+pw/2, baseY);
-            ctx.closePath();
-            ctx.fill();
-            
-            // Снежные вершины
-            ctx.fillStyle = 'rgba(255,255,255,0.6)';
-            ctx.beginPath();
-            ctx.moveTo(px-pw*0.12, baseY-ph*0.75);
-            ctx.lineTo(px, baseY-ph);
-            ctx.lineTo(px+pw*0.12, baseY-ph*0.75);
-            ctx.closePath();
-            ctx.fill();
+        const baseY = H*0.58;
+        if(theme.mountains) {
+            for(const m of theme.mountains) {
+                const px = W*m.offset, pw = W*m.width, ph = H*m.peak;
+                ctx.fillStyle = m.color;
+                ctx.beginPath();
+                ctx.moveTo(px-pw/2, baseY);
+                ctx.lineTo(px, baseY-ph);
+                ctx.lineTo(px+pw/2, baseY);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.beginPath();
+                ctx.moveTo(px-pw*0.1, baseY-ph*0.7);
+                ctx.lineTo(px, baseY-ph);
+                ctx.lineTo(px+pw*0.1, baseY-ph*0.7);
+                ctx.closePath();
+                ctx.fill();
+            }
         }
 
-        // Земля
         ctx.fillStyle = theme.groundColor;
         ctx.fillRect(0, baseY, W, H-baseY);
 
-        // Облака
         for(const cl of S.clouds) {
             cl.x += cl.sp;
             if(cl.x > W+200) cl.x = -200;
-            ctx.fillStyle = theme.cloudColor;
-            ctx.beginPath();
-            ctx.ellipse(cl.x, cl.y, cl.w/2, cl.h/2, 0, 0, Math.PI*2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.ellipse(cl.x-cl.w*0.25, cl.y-cl.h*0.2, cl.w*0.35, cl.h*0.4, 0, 0, Math.PI*2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.ellipse(cl.x+cl.w*0.25, cl.y-cl.h*0.15, cl.w*0.3, cl.h*0.35, 0, 0, Math.PI*2);
-            ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.75)';
+            ctx.beginPath(); ctx.ellipse(cl.x, cl.y, cl.w/2, cl.h/2, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cl.x-cl.w*0.25, cl.y-cl.h*0.2, cl.w*0.35, cl.h*0.4, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cl.x+cl.w*0.25, cl.y-cl.h*0.15, cl.w*0.3, cl.h*0.35, 0, 0, Math.PI*2); ctx.fill();
         }
 
-        // Снежинки
         for(const sf of S.snowflakes) {
-            sf.y += sf.sp;
-            sf.x += sf.wind;
-            if(sf.y > H) { sf.y = -10; sf.x = Math.random()*W; }
-            ctx.fillStyle = 'rgba(255,255,255,'+sf.alpha.toFixed(2)+')';
+            sf.y += sf.sp; sf.x += sf.wind;
+            if(sf.y > H+10) { sf.y = -10; sf.x = Math.random()*W; }
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
             ctx.beginPath(); ctx.arc(sf.x, sf.y, sf.r, 0, Math.PI*2); ctx.fill();
         }
 
-        // Деревья на переднем плане
-        const treePositions = [0.15, 0.35, 0.55, 0.75, 0.9];
-        for(const tx of treePositions) {
-            const treeX = W*tx;
-            const treeY = baseY;
-            // Ствол
+        for(const tx of S.treePos) {
+            const treeX = W*tx, treeY = baseY;
             ctx.fillStyle = '#4a3728';
-            ctx.fillRect(treeX-4, treeY-50, 8, 50);
-            // Крона (треугольник)
+            ctx.fillRect(treeX-4, treeY-45, 8, 45);
             ctx.fillStyle = '#2d5a27';
-            ctx.beginPath();
-            ctx.moveTo(treeX, treeY-80);
-            ctx.lineTo(treeX-25, treeY-30);
-            ctx.lineTo(treeX+25, treeY-30);
-            ctx.closePath();
-            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(treeX, treeY-75); ctx.lineTo(treeX-22, treeY-25); ctx.lineTo(treeX+22, treeY-25); ctx.closePath(); ctx.fill();
             ctx.fillStyle = '#3a7d32';
-            ctx.beginPath();
-            ctx.moveTo(treeX, treeY-65);
-            ctx.lineTo(treeX-20, treeY-20);
-            ctx.lineTo(treeX+20, treeY-20);
-            ctx.closePath();
-            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(treeX, treeY-60); ctx.lineTo(treeX-18, treeY-18); ctx.lineTo(treeX+18, treeY-18); ctx.closePath(); ctx.fill();
         }
     }
 
-    // 💀 ПРЕИСПОДНЯЯ
     function drawHellscape(now) {
-        // Тёмно-красный фон
-        const hellGrad = ctx.createRadialGradient(W/2, H*0.6, 0, W/2, H*0.6, Math.max(W,H));
-        hellGrad.addColorStop(0, '#2a0000');
-        hellGrad.addColorStop(0.5, '#1a0000');
-        hellGrad.addColorStop(1, '#000000');
+        const hellGrad = ctx.createRadialGradient(W/2, H*0.55, 0, W/2, H*0.55, Math.max(W,H));
+        hellGrad.addColorStop(0, '#2a0000'); hellGrad.addColorStop(0.6, '#1a0000'); hellGrad.addColorStop(1, '#000');
         ctx.fillStyle = hellGrad;
         ctx.fillRect(0, 0, W, H);
 
-        // Лавовые прожилки
-        ctx.strokeStyle = 'rgba(255,69,0,0.3)';
-        ctx.lineWidth = 2;
-        for(let i=0; i<8; i++) {
+        ctx.strokeStyle = 'rgba(255,69,0,0.25)'; ctx.lineWidth = 2.5;
+        for(let i=0; i<6; i++) {
             ctx.beginPath();
             let lx = Math.random()*W, ly = H;
             ctx.moveTo(lx, ly);
-            for(let j=0; j<10; j++) {
-                lx += (Math.random()-0.5)*60;
-                ly -= 20+Math.random()*40;
-                ctx.lineTo(lx, ly);
-            }
+            for(let j=0; j<12; j++) { lx += (Math.random()-0.5)*70; ly -= 18+Math.random()*45; ctx.lineTo(lx, ly); }
             ctx.stroke();
         }
 
-        // Лавовые капли
         for(const ld of S.lavaDrops) {
-            ld.y += ld.sp;
-            ld.life++;
-            if(ld.life > ld.maxLife || ld.y > H+50) {
-                ld.y = Math.random()*H*0.4 + H*0.6;
-                ld.life = 0;
-            }
-            const alpha = ld.life < ld.maxLife*0.3 ? ld.life/(ld.maxLife*0.3) : 1 - (ld.life-ld.maxLife*0.3)/(ld.maxLife*0.7);
-            ctx.fillStyle = theme.emberColor.replace('0.8', Math.max(0,alpha*0.8).toFixed(2));
+            ld.y += ld.sp; ld.life++;
+            if(ld.life > 100 || ld.y > H+60) { ld.y = H*0.45+Math.random()*H*0.55; ld.life = 0; ld.x = Math.random()*W; }
+            const alpha = ld.life < 30 ? ld.life/30 : 1 - (ld.life-30)/70;
+            ctx.fillStyle = 'rgba(255,100,0,'+Math.max(0,alpha*0.7).toFixed(2)+')';
             ctx.beginPath(); ctx.arc(ld.x, ld.y, ld.r, 0, Math.PI*2); ctx.fill();
         }
 
-        // Черепа на фоне
         for(const sk of S.skulls) {
             sk.ph += sk.sp;
-            const alpha = sk.alpha + Math.sin(sk.ph)*0.05;
-            ctx.save();
-            ctx.globalAlpha = Math.max(0.03, alpha);
-            ctx.fillStyle = '#fff';
-            ctx.font = sk.size+'px serif';
+            const alpha = 0.06 + Math.abs(Math.sin(sk.ph))*0.08;
+            ctx.save(); ctx.globalAlpha = alpha;
+            ctx.fillStyle = '#fff'; ctx.font = sk.size+'px serif';
             ctx.fillText('💀', sk.x, sk.y);
             ctx.restore();
         }
 
-        // Огонь на земле
-        const fireBase = H*0.85;
-        for(let i=0; i<12; i++) {
-            const fx = (W/12)*i + Math.sin(now*0.01+i)*20;
-            const fh = 30+Math.abs(Math.sin(now*0.02+i*1.5))*50;
-            const fGrad = ctx.createLinearGradient(fx, fireBase, fx, fireBase-fh);
-            fGrad.addColorStop(0, 'rgba(255,0,0,0.6)');
-            fGrad.addColorStop(0.4, 'rgba(255,140,0,0.4)');
-            fGrad.addColorStop(0.7, 'rgba(255,215,0,0.2)');
+        const fireBase = H*0.88;
+        for(let i=0; i<S.fireSpots.length; i++) {
+            const fs = S.fireSpots[i];
+            const fh = 25+Math.abs(Math.sin(now*0.015+fs.ph))*55;
+            const fGrad = ctx.createLinearGradient(fs.x, fireBase, fs.x, fireBase-fh);
+            fGrad.addColorStop(0, 'rgba(255,0,0,0.7)');
+            fGrad.addColorStop(0.4, 'rgba(255,140,0,0.5)');
+            fGrad.addColorStop(0.8, 'rgba(255,215,0,0.2)');
             fGrad.addColorStop(1, 'transparent');
             ctx.fillStyle = fGrad;
             ctx.beginPath();
-            ctx.moveTo(fx-8, fireBase);
-            ctx.quadraticCurveTo(fx-15, fireBase-fh*0.7, fx, fireBase-fh);
-            ctx.quadraticCurveTo(fx+15, fireBase-fh*0.7, fx+8, fireBase);
+            ctx.moveTo(fs.x-10, fireBase);
+            ctx.quadraticCurveTo(fs.x-18, fireBase-fh*0.7, fs.x, fireBase-fh);
+            ctx.quadraticCurveTo(fs.x+18, fireBase-fh*0.7, fs.x+10, fireBase);
             ctx.fill();
         }
     }
 
-    // 💜 КИБЕРПАНК
     function drawCyberpunkBg(now) {
         const bgGrad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H)*0.9);
-        bgGrad.addColorStop(0, theme.bg); bgGrad.addColorStop(1, '#000000');
+        bgGrad.addColorStop(0, theme.bg); bgGrad.addColorStop(1, '#000');
         ctx.fillStyle = bgGrad; ctx.fillRect(0,0,W,H);
         
-        // Сетка
-        ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 0.6;
-        const step = 30; ctx.beginPath();
+        ctx.strokeStyle = 'rgba(0,255,255,0.04)'; ctx.lineWidth = 0.6;
+        const step = 32; ctx.beginPath();
         for(let x=0; x<W; x+=step) { ctx.moveTo(x,0); ctx.lineTo(x,H); }
         for(let y=0; y<H; y+=step) { ctx.moveTo(0,y); ctx.lineTo(W,y); }
         ctx.stroke();
 
-        // Звёзды
         for(const s of S.stars) {
             const a=(Math.sin(now*s.sp+s.ph)+1)/2*s.a;
-            ctx.fillStyle = theme.starColor + Math.max(0.03,a).toFixed(3)+')';
+            ctx.fillStyle = 'rgba(180,220,255,'+Math.max(0.04,a).toFixed(3)+')';
             ctx.beginPath();
-            if(s.r>2) { ctx.arc(s.x,s.y,s.r,0,Math.PI*2); }
-            else { ctx.fillRect(s.x-0.5,s.y-0.5,1,1); }
+            s.r>2 ? ctx.arc(s.x,s.y,s.r,0,Math.PI*2) : ctx.fillRect(s.x-0.5,s.y-0.5,1,1);
             ctx.fill();
         }
     }
@@ -750,29 +569,22 @@
         const cs = 18 + Math.sin(now*0.004)*6;
         ctx.globalAlpha = 0.45; ctx.strokeStyle = theme.hudText; ctx.lineWidth = 1.2;
         ctx.setLineDash([3, 7]);
-        ctx.beginPath();
-        ctx.moveTo(cx-cs, cy); ctx.lineTo(cx+cs, cy);
-        ctx.moveTo(cx, cy-cs); ctx.lineTo(cx, cy+cs);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx-cs, cy); ctx.lineTo(cx+cs, cy); ctx.moveTo(cx, cy-cs); ctx.lineTo(cx, cy+cs); ctx.stroke();
         ctx.setLineDash([]);
-        ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2);
-        ctx.fillStyle = theme.accent; ctx.globalAlpha = 0.7;
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.fillStyle = theme.accent; ctx.fill();
         ctx.restore();
     }
 
     function drawCells() {
         for(const c of S.cells) {
             ctx.save();
-            const glowPulse = 1 + Math.sin(performance.now()*0.004 + c.glowPhase)*0.15;
-            ctx.shadowBlur = 22 * glowPulse;
-            ctx.shadowColor = c.edge;
+            const gp = 1 + Math.sin(performance.now()*0.004 + c.glowPhase)*0.15;
+            ctx.shadowBlur = 22 * gp; ctx.shadowColor = c.edge;
             ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(c.x+4, c.y+4, c.w, c.h);
             ctx.fillStyle = c.color; ctx.fillRect(c.x, c.y, c.w, c.h);
             ctx.shadowBlur = 0;
             ctx.strokeStyle = c.edge; ctx.lineWidth = 2.5; ctx.strokeRect(c.x, c.y, c.w, c.h);
-            ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 0.8;
-            ctx.strokeRect(c.x+4, c.y+4, c.w-8, c.h-8);
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 0.8; ctx.strokeRect(c.x+4, c.y+4, c.w-8, c.h-8);
             const grad = ctx.createLinearGradient(c.x, c.y, c.x, c.y+c.h);
             grad.addColorStop(0, 'rgba(255,255,255,0.1)'); grad.addColorStop(0.45, 'rgba(255,255,255,0.02)'); grad.addColorStop(1, 'rgba(0,0,0,0.3)');
             ctx.fillStyle = grad; ctx.fillRect(c.x, c.y, c.w, c.h);
@@ -790,7 +602,7 @@
         for(const p of S.particles) {
             const a = 1-p.life/p.max;
             ctx.save(); ctx.globalAlpha = Math.max(0, a);
-            ctx.fillStyle = p.col + (a*0.95).toFixed(3)+')';
+            ctx.fillStyle = 'rgba(255,255,255,'+(a*0.8).toFixed(3)+')';
             ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
             ctx.restore();
         }
@@ -799,19 +611,20 @@
     function drawHUD(now) {
         if(S.phase==='orbit'||S.phase==='trans'||S.phase==='shuffle') {
             const pulse = 0.5+0.5*Math.sin(now*0.0035);
-            ctx.save();
-            ctx.globalAlpha = 0.12+pulse*0.14;
+            ctx.save(); ctx.globalAlpha = 0.12+pulse*0.14;
             ctx.fillStyle = theme.hudText;
             ctx.font = 'bold '+Math.min(46,Math.max(24,W*0.035))+'px "Courier New"';
-            ctx.textAlign = 'center';
-            ctx.fillText('LIMBO', W/2, H/2+6);
+            ctx.textAlign = 'center'; ctx.fillText('LIMBO', W/2, H/2+6);
             ctx.restore();
         }
         canvas.style.transform = S.shake>0.1 ? `translate(${(Math.random()-0.5)*S.shake}px,${(Math.random()-0.5)*S.shake}px)` : 'translate(0,0)';
     }
 
     function loop(now) {
-        if(!S.running) { drawBackground(now); updateParticles(); drawParticles(); S.animId = requestAnimationFrame(loop); return; }
+        if(!S.running) { 
+            drawBackground(now); updateParticles(); drawParticles(); 
+            S.animId = requestAnimationFrame(loop); return; 
+        }
         if(!S.paused) {
             const elapsed = (now-S.tStart)/1000;
             if(S.phase==='reveal'&&now-S.tPhase>=S.cfg.reveal) {
@@ -831,18 +644,23 @@
     window.addEventListener('keydown',function(e) {
         if(e.key==='Escape') { if(document.fullscreenElement) document.exitFullscreen(); return; }
         if(e.key==='r'||e.key==='R'||e.key==='к'||e.key==='К') { restart(); return; }
-        if(e.key===' ') { e.preventDefault(); S.paused=!S.paused; if(S.paused) { bgm.pause(); } else { bgm.play().catch(()=>{}); } }
+        if(e.key===' ') { e.preventDefault(); S.paused=!S.paused; if(S.paused) bgm.pause(); else bgm.play().catch(()=>{}); }
     });
 
     function restart() {
-        gameStarted = false; S.running=false; S.phase='menu'; S.particles=[]; S.shake=0;
-        clearTimeout(S.swapTimer); bgm.pause(); bgm.currentTime=185;
+        gameStarted = false; S.running = false; S.phase = 'menu';
+        S.particles = []; S.shake = 0;
+        clearTimeout(S.swapTimer);
+        bgm.pause(); bgm.currentTime = 185;
         menuOverlay.classList.remove('hidden');
         setStatus('SYS:// OFFLINE','TIME:// 0.0s','LIMBO');
-        canvas.style.transform='translate(0,0)';
+        canvas.style.transform = 'translate(0,0)';
+        // Сбрасываем тему на normal для меню
+        theme = THEMES.normal;
     }
 
-    resize(); setStatus('SYS:// OFFLINE','TIME:// 0.0s','LIMBO');
+    resize();
+    setStatus('SYS:// OFFLINE','TIME:// 0.0s','LIMBO');
     S.animId = requestAnimationFrame(loop);
 })();
 </script>
