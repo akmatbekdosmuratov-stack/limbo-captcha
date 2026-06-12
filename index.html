@@ -58,10 +58,10 @@ button:hover {
 
 <div id="startScreen">
     <h1>LIMBO</h1>
-    <button onclick="startGame()">START</button>
+    <button id="startBtn" type="button">START</button>
 </div>
 
-<audio id="bgm" loop>
+<audio id="bgm" preload="auto" loop>
     <source src="LIMBO.mp3" type="audio/mpeg">
 </audio>
 
@@ -70,6 +70,7 @@ const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
 const bgm = document.getElementById("bgm");
 const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
 
 function resize(){
     canvas.width = window.innerWidth;
@@ -78,19 +79,33 @@ function resize(){
 window.addEventListener("resize", resize);
 resize();
 
-function startGame(){
-    // запуск музыки (работает в браузерах)
-    bgm.volume = 0.6;
-    bgm.currentTime = 0;
+let started = false;
 
-    bgm.play().catch(err => {
-        console.log("Audio blocked:", err);
-    });
+async function startGame(){
+    if (started) return;
+    started = true;
 
+    // Прячем экран только после клика
     startScreen.style.display = "none";
+
+    // Надёжная попытка запуска аудио
+    try {
+        bgm.volume = 0.6;
+        bgm.currentTime = 0;
+        bgm.load();
+
+        const playPromise = bgm.play();
+        if (playPromise !== undefined) {
+            await playPromise;
+        }
+    } catch (err) {
+        console.log("Audio blocked:", err);
+    }
 
     loop();
 }
+
+startBtn.addEventListener("click", startGame);
 
 // простой визуальный фон (чтобы было видно что сайт живой)
 function loop(){
