@@ -2,18 +2,18 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>LIMBO Game</title>
+    <title>LIMBO</title>
     <style>
-        body { margin: 0; background: #0a0a14; color: white; font-family: sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        #menu-overlay { position: absolute; z-index: 10; text-align: center; }
+        body { margin: 0; background: #0a0a14; color: white; font-family: sans-serif; overflow: hidden; }
+        canvas { display: block; }
+        #menu-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10; }
         button { padding: 15px 30px; font-size: 20px; cursor: pointer; background: transparent; color: #fff; border: 1px solid #fff; margin: 10px; transition: 0.3s; }
         button:hover { background: #fff; color: #0a0a14; }
-        canvas { display: block; }
-        #status-left, #status-right, #center-msg { position: absolute; color: #fff; pointer-events: none; font-family: monospace; }
+        .hidden { display: none; }
+        #status-left, #status-right, #center-msg { position: absolute; pointer-events: none; font-family: monospace; z-index: 5; }
         #status-left { top: 20px; left: 20px; }
         #status-right { top: 20px; right: 20px; }
-        #center-msg { bottom: 20px; width: 100%; text-align: center; font-size: 1.2em; }
-        .hidden { display: none; }
+        #center-msg { bottom: 20px; width: 100%; text-align: center; font-size: 1.5em; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -36,41 +36,48 @@
         const ctx = canvas.getContext('2d');
         const menu = document.getElementById('menu-overlay');
 
-        let W, H, game = { running: false, phase: 'menu', cells: [] };
+        // Игровое состояние
+        let game = { running: false, mode: 'normal' };
 
         function resize() {
-            W = window.innerWidth; H = window.innerHeight;
-            canvas.width = W; canvas.height = H;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
         window.onresize = resize;
         resize();
 
         function startGame(mode) {
-            menu.classList.add('hidden');
+            game.mode = mode;
             game.running = true;
-            game.phase = 'game';
-            document.getElementById('center-msg').textContent = "РЕЖИМ: " + mode.toUpperCase();
-            loop();
+            menu.classList.add('hidden');
+            document.getElementById('center-msg').textContent = "РЕЖИМ " + mode.toUpperCase() + " АКТИВИРОВАН";
+            requestAnimationFrame(loop);
         }
 
+        // Привязка кнопок
         document.getElementById('btn-easy').onclick = () => startGame('easy');
         document.getElementById('btn-normal').onclick = () => startGame('normal');
         document.getElementById('btn-limbo').onclick = () => startGame('limbo');
 
         function loop() {
             if (!game.running) return;
+            
+            // Фон
             ctx.fillStyle = '#0a0a14';
-            ctx.fillRect(0, 0, W, H);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Здесь будет отрисовка игры
-            ctx.fillStyle = 'white';
-            ctx.fillText("ИГРА ИДЕТ (нажми R для выхода)", 20, 20);
-            
+            // Здесь будет отрисовываться игровой процесс
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 100, 0, Math.PI*2);
+            ctx.fill();
+
             requestAnimationFrame(loop);
         }
 
+        // Выход в меню по клавише R
         window.addEventListener('keydown', (e) => {
-            if(e.key === 'r' || e.key === 'R') {
+            if(e.key.toLowerCase() === 'r') {
                 game.running = false;
                 menu.classList.remove('hidden');
                 document.getElementById('center-msg').textContent = "";
