@@ -1,317 +1,81 @@
-(function() {
-    const canvas = document.getElementById('c');
-    const ctx = canvas ? canvas.getContext('2d') : null;
-    const menuOverlay = document.getElementById('menu-overlay');
-    const statusLeft = document.getElementById('status-left');
-    const statusRight = document.getElementById('status-right');
-    const centerMsg = document.getElementById('center-msg');
-    const logArea = document.getElementById('log-area');
-    const bgm = document.getElementById('bgm');
-    const soundBtn = document.getElementById('soundBtn');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>LIMBO Game</title>
+    <style>
+        body { margin: 0; background: #0a0a14; color: white; font-family: sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        #menu-overlay { position: absolute; z-index: 10; text-align: center; }
+        button { padding: 15px 30px; font-size: 20px; cursor: pointer; background: transparent; color: #fff; border: 1px solid #fff; margin: 10px; transition: 0.3s; }
+        button:hover { background: #fff; color: #0a0a14; }
+        canvas { display: block; }
+        #status-left, #status-right, #center-msg { position: absolute; color: #fff; pointer-events: none; font-family: monospace; }
+        #status-left { top: 20px; left: 20px; }
+        #status-right { top: 20px; right: 20px; }
+        #center-msg { bottom: 20px; width: 100%; text-align: center; font-size: 1.2em; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
 
-    let W, H, audioReady = false;
-    
-    // Безопасная проверка аудио
-    if (bgm) {
-        bgm.oncanplaythrough = () => audioReady = true;
-    }
-    if (soundBtn) {
-        soundBtn.onclick = (e) => { 
-            e.stopPropagation(); 
-            if (!bgm) return;
-            if(bgm.paused){ bgm.currentTime=185; bgm.volume=0.55; bgm.play().catch(()=>{}); soundBtn.textContent='🔊'; } 
-            else { bgm.pause(); soundBtn.textContent='🔇'; } 
-        };
-    }
+    <div id="menu-overlay">
+        <h1>LIMBO</h1>
+        <button id="btn-easy">EASY</button>
+        <button id="btn-normal">NORMAL</button>
+        <button id="btn-limbo">LIMBO</button>
+    </div>
 
-    const CONFIG = {
-        easy:   { name:'easy',   reveal:4200, shuffle:10000, beat:500, orbit:0.005, trans:2000 },
-        normal: { name:'normal', reveal:4200, shuffle:10000, beat:350, orbit:0.008, trans:1800 },
-        limbo:  { name:'limbo',  reveal:4200, shuffle:10000, beat:200, orbit:0.012, trans:1500 }
-    };
+    <div id="status-left"></div>
+    <div id="status-right"></div>
+    <div id="center-msg"></div>
 
-    const THEMES = {
-        easy: {
-            cellBg:'rgba(255,255,255,0.12)', cellEdge:'rgba(255,255,255,0.85)',
-            correctBg:'rgba(76,175,80,0.5)', correctEdge:'#4CAF50',
-            wrongBg:'rgba(244,67,54,0.5)', wrongEdge:'#F44336',
-            ringColor:'rgba(255,255,255,0.5)', hudText:'#ffffff', accent:'#FFD700'
-        },
-        normal: {
-            cellBg:'rgba(0,245,255,0.1)', cellEdge:'rgba(0,245,255,0.85)',
-            correctBg:'rgba(57,255,20,0.4)', correctEdge:'#39FF14',
-            wrongBg:'rgba(255,0,64,0.5)', wrongEdge:'#FF0040',
-            ringColor:'rgba(0,255,255,0.5)', hudText:'#00FFFF', accent:'#00FFFF'
-        },
-        limbo: {
-            cellBg:'rgba(255,100,0,0.18)', cellEdge:'rgba(255,140,0,0.9)',
-            correctBg:'rgba(255,215,0,0.5)', correctEdge:'#FFD700',
-            wrongBg:'rgba(139,0,0,0.6)', wrongEdge:'#8B0000',
-            ringColor:'rgba(255,100,0,0.6)', hudText:'#FF8C00', accent:'#FF4500'
+    <canvas id="c"></canvas>
+
+    <script>
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        const menu = document.getElementById('menu-overlay');
+
+        let W, H, game = { running: false, phase: 'menu', cells: [] };
+
+        function resize() {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
         }
-    };
+        window.onresize = resize;
+        resize();
 
-    let theme = THEMES.normal, gameStarted = false;
-    const S = {
-        cfg: CONFIG.normal, phase:'menu', running:false, paused:false,
-        cells:[], correctId:null, gridPos:[], tStart:0, tPhase:0, tShuffle:0,
-        orbitAngle:0, particles:[], shake:0, animId:null, swapTimer:null, boardRX:0, boardRY:0,
-        clouds:[], birds:[], mountains:[], trees:[], wildflowers:[], river:{points:[]}, rocks:[], bushes:[], ferns:[], reeds:[],
-        neonSigns:[], rainDrops:[], puddles:[], lavaRivers:[], embers:[], skulls:[], ruins:[], smokeParticles:[]
-    };
-
-    // Привязка кнопок
-    const btnEasy = document.getElementById('btn-easy');
-    const btnNormal = document.getElementById('btn-normal');
-    const btnLimbo = document.getElementById('btn-limbo');
-    
-    if (btnEasy) btnEasy.onclick = () => startGame('easy');
-    if (btnNormal) btnNormal.onclick = () => startGame('normal');
-    if (btnLimbo) btnLimbo.onclick = () => startGame('limbo');
-
-    function resize() {
-        if (!canvas) return;
-        W = window.innerWidth; H = window.innerHeight;
-        canvas.width = W; canvas.height = H;
-        const cols=2, rows=4;
-        const tileW = Math.min(120, Math.max(70, W*0.12));
-        const tileH = tileW * 0.85;
-        const gapX = Math.max(25, tileW*0.35);
-        const gapY = Math.max(15, tileH*0.2);
-        const bw = cols*tileW + (cols-1)*gapX, bh = rows*tileH + (rows-1)*gapY;
-        const bx = (W-bw)/2, by = (H-bh)/2;
-        S.gridPos = [];
-        for(let r=0; r<rows; r++) for(let c=0; c<cols; c++)
-            S.gridPos.push({x:bx+c*(tileW+gapX), y:by+r*(tileH+gapY), w:tileW, h:tileH});
-        S.boardRX = Math.min(W,H)*0.38;
-        S.boardRY = Math.min(W,H)*0.22;
-        if(S.cells.length) for(let i=0; i<S.cells.length; i++) { S.cells[i].w=S.gridPos[i].w; S.cells[i].h=S.gridPos[i].h; }
-
-        S.clouds = Array.from({length:8}, () => ({x:Math.random()*W, y:20+Math.random()*H*0.2, w:80+Math.random()*140, sp:0.1+Math.random()*0.3}));
-        S.birds = Array.from({length:12}, (_,i) => ({ x: W*0.5 + i*30, y: H*0.25 + i*5, sp: 0.5 + Math.random()*0.5, wing: Math.random()*Math.PI*2, size: i<3 ? 1.5 : 0.6 }));
-        S.mountains = [ {x:W*0.08, w:W*0.5, h:H*0.38, color:'#3f4d4f', snow:0.28}, {x:W*0.45, w:W*0.6, h:H*0.44, color:'#2f3b3d', snow:0.32}, {x:W*0.9, w:W*0.4, h:H*0.34, color:'#3f4d4f', snow:0.22} ];
-        S.river.points = [];
-        let rx = W*0.15, ry = H*0.6;
-        for (let i=0; i<25; i++) { S.river.points.push({x:rx, y:ry}); rx += (W*0.7/25) + (Math.random()-0.5)*25; ry += (H*0.3/25) + (Math.random()-0.5)*12; }
-    }
-    window.onresize = resize;
-
-    function setStatus(l,r,m) { 
-        if(statusLeft) statusLeft.textContent=l; 
-        if(statusRight) statusRight.textContent=r; 
-        if(m && centerMsg) centerMsg.textContent=m; 
-    }
-
-    function createCells() {
-        S.cells = S.gridPos.map((g,i) => ({id:i, x:g.x, y:g.y, w:g.w, h:g.h, color:theme.cellBg, edge:theme.cellEdge, isCorrect:false, gp:Math.random()*Math.PI*2}));
-        const idx = Math.floor(Math.random()*8);
-        S.correctId = S.cells[idx].id;
-        S.cells[idx].isCorrect = true;
-        S.cells[idx].color = theme.correctBg;
-        S.cells[idx].edge = theme.correctEdge;
-    }
-
-    function startGame(mode) {
-        try {
-            if(gameStarted) return;
-            gameStarted = true;
-            S.cfg = CONFIG[mode]; theme = THEMES[mode];
-            S.phase = 'reveal'; S.running = true; S.paused = false;
-            S.particles = []; S.shake = 0; S.orbitAngle = 0;
-            clearTimeout(S.swapTimer);
-            resize(); createCells();
-            S.cells.forEach((c,i)=>{ const g=S.gridPos[i]; c.x=g.x; c.y=g.y; });
-            S.tStart = performance.now(); S.tPhase = S.tStart;
-            if(menuOverlay) menuOverlay.classList.add('hidden');
-            if(audioReady && bgm) { bgm.currentTime=185; bgm.volume=0.55; bgm.play().catch(()=>{}); }
-            setStatus('◆ SYS ONLINE','⏱ 0.0s','ЗАПОМНИ ЯЧЕЙКУ');
-            cancelAnimationFrame(S.animId);
-            S.animId = requestAnimationFrame(loop);
-        } catch (err) {
-            alert("Ошибка при запуске игры: " + err.message);
+        function startGame(mode) {
+            menu.classList.add('hidden');
+            game.running = true;
+            game.phase = 'game';
+            document.getElementById('center-msg').textContent = "РЕЖИМ: " + mode.toUpperCase();
+            loop();
         }
-    }
 
-    function restart() {
-        gameStarted = false; S.running = false; S.phase = 'menu';
-        S.particles = []; S.shake = 0; clearTimeout(S.swapTimer);
-        if(bgm) { bgm.pause(); bgm.currentTime=185; }
-        if(menuOverlay) menuOverlay.classList.remove('hidden');
-        theme = THEMES.normal;
-        setStatus('◆ SYS OFFLINE','⏱ 0.0s','LIMBO');
-        if(canvas) canvas.style.transform = 'translate(0,0)';
-    }
+        document.getElementById('btn-easy').onclick = () => startGame('easy');
+        document.getElementById('btn-normal').onclick = () => startGame('normal');
+        document.getElementById('btn-limbo').onclick = () => startGame('limbo');
 
-    function scheduleSwap() {
-        if(S.phase!=='shuffle') return;
-        const now=performance.now();
-        if(!S.tShuffle) S.tShuffle=now;
-        if(now-S.tShuffle >= S.cfg.shuffle) {
-            S.phase='trans'; S.tPhase=now; S.orbitAngle=0;
-            setStatus('SYS:// TRANSITION','TIME:// '+((now-S.tStart)/1000).toFixed(1)+'s','ФОРМИРУЮ ОРБИТУ');
-            return;
+        function loop() {
+            if (!game.running) return;
+            ctx.fillStyle = '#0a0a14';
+            ctx.fillRect(0, 0, W, H);
+            
+            // Здесь будет отрисовка игры
+            ctx.fillStyle = 'white';
+            ctx.fillText("ИГРА ИДЕТ (нажми R для выхода)", 20, 20);
+            
+            requestAnimationFrame(loop);
         }
-        const a=Math.floor(Math.random()*8); let b=Math.floor(Math.random()*8);
-        while(b===a) b=Math.floor(Math.random()*8);
-        animateSwap(a,b,Math.max(80,S.cfg.beat*0.7));
-        S.swapTimer=setTimeout(scheduleSwap,S.cfg.beat);
-    }
 
-    function animateSwap(i,j,dur) {
-        const c1=S.cells[i], c2=S.cells[j], x1=c1.x, y1=c1.y, x2=c2.x, y2=c2.y, start=performance.now();
-        function step(now) {
-            const p=Math.min(1,(now-start)/dur), e=p<0.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
-            c1.x=x1+(x2-x1)*e; c1.y=y1+(y2-y1)*e; c2.x=x2+(x1-x2)*e; c2.y=y2+(y1-y2)*e;
-            if(p<1) requestAnimationFrame(step); 
-            else { [S.cells[i], S.cells[j]] = [S.cells[j], S.cells[i]]; c1.x=x2; c1.y=y2; c2.x=x1; c2.y=y1; }
-        }
-        requestAnimationFrame(step);
-    }
-
-    function getOrbitPos(i,angle) {
-        const cx=W/2, cy=H/2, a=angle+i*Math.PI*2/8;
-        return {x:cx+Math.cos(a)*S.boardRX-S.cells[i].w/2, y:cy+Math.sin(a)*S.boardRY-S.cells[i].h/2};
-    }
-
-    function updateTransition(now) {
-        const p=Math.min(1,(now-S.tPhase)/S.cfg.trans), e=1-Math.pow(1-p,3);
-        S.cells.forEach((c,i)=>{ const g=S.gridPos[i], o=getOrbitPos(i,S.orbitAngle); c.x=g.x+(o.x-g.x)*e; c.y=g.y+(o.y-g.y)*e; });
-        if(p>=1) {
-            S.phase='orbit'; S.tPhase=now;
-            setStatus('SYS:// AWAITING INPUT','TIME:// '+((now-S.tStart)/1000).toFixed(1)+'s','ВЫБИРАЙ!');
-            spawnBurst(50);
-        }
-    }
-
-    function updateOrbit() {
-        S.orbitAngle+=S.cfg.orbit;
-        S.cells.forEach((c,i)=>{ const o=getOrbitPos(i,S.orbitAngle); c.x=o.x; c.y=o.y; });
-    }
-
-    if (canvas) {
-        canvas.addEventListener('click',function(e) {
-            if(!gameStarted||S.phase!=='orbit'||!S.running||S.paused) return;
-            const rect=canvas.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
-            for(let i=0; i<S.cells.length; i++) {
-                const c=S.cells[i];
-                if(mx>=c.x&&mx<=c.x+c.w&&my>=c.y&&my<=c.y+c.h) { handlePick(c); return; }
+        window.addEventListener('keydown', (e) => {
+            if(e.key === 'r' || e.key === 'R') {
+                game.running = false;
+                menu.classList.remove('hidden');
+                document.getElementById('center-msg').textContent = "";
             }
         });
-    }
-
-    function handlePick(clickedCell) {
-        S.phase='result';
-        const correct = clickedCell.id === S.correctId;
-        if(correct) {
-            clickedCell.color = theme.correctBg; clickedCell.edge = theme.correctEdge;
-            if(centerMsg) { centerMsg.textContent = '✔ ДОСТУП РАЗРЕШЁН ✔'; centerMsg.style.color = theme.correctEdge; }
-            S.shake=8; spawnBurst(70);
-        } else {
-            clickedCell.color = theme.wrongBg; clickedCell.edge = theme.wrongEdge;
-            const correctCell = S.cells.find(c => c.id === S.correctId);
-            if(correctCell) { correctCell.color = theme.correctBg; correctCell.edge = theme.correctEdge; }
-            if(centerMsg) { centerMsg.textContent = '💀 ДОСТУП ЗАПРЕЩЁН 💀'; centerMsg.style.color = theme.wrongEdge; }
-            S.shake=18; spawnBurst(35);
-        }
-    }
-
-    function spawnBurst(n) {
-        const cx=W/2, cy=H/2;
-        for(let i=0; i<n; i++) {
-            const a=Math.random()*Math.PI*2, s=1.5+Math.random()*5;
-            S.particles.push({x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:0,max:30+Math.random()*35,size:1.5+Math.random()*4.5});
-        }
-    }
-
-    function updateParticles() {
-        for(let i=S.particles.length-1; i>=0; i--) {
-            const p=S.particles[i]; p.x+=p.vx; p.y+=p.vy; p.life++; p.vx*=0.992; p.vy*=0.992;
-            if(p.life>=p.max) S.particles.splice(i,1);
-        }
-    }
-
-    function drawBackground(now) {
-        if (!ctx) return;
-        ctx.fillStyle = '#0a0a14'; ctx.fillRect(0,0,W,H);
-    }
-
-    function drawOrbitRings(now) {
-        if (!ctx) return;
-        const cx=W/2, cy=H/2, p=1+Math.sin(now*0.0025)*0.05;
-        ctx.save(); 
-        ctx.globalAlpha=0.3; ctx.strokeStyle=theme.ringColor; ctx.lineWidth=2;
-        ctx.setLineDash([8, 16]);
-        ctx.beginPath(); ctx.ellipse(cx,cy,S.boardRX*p,S.boardRY*p,0,0,Math.PI*2); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.restore();
-    }
-
-    function drawCells() {
-        if (!ctx) return;
-        for(const c of S.cells) {
-            ctx.save();
-            ctx.fillStyle = c.color; ctx.fillRect(c.x, c.y, c.w, c.h);
-            ctx.strokeStyle = c.edge; ctx.lineWidth = 2.5; ctx.strokeRect(c.x, c.y, c.w, c.h);
-            ctx.restore();
-        }
-    }
-
-    function drawParticles() {
-        if (!ctx) return;
-        for(const p of S.particles) {
-            const a = 1-p.life/p.max;
-            ctx.save(); ctx.globalAlpha = Math.max(0, a);
-            ctx.fillStyle = 'rgba(255,255,255,'+(a*0.8).toFixed(3)+')';
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
-            ctx.restore();
-        }
-    }
-
-    function drawHUD(now) {
-        if(canvas && S.shake>0.1) {
-            canvas.style.transform = `translate(${(Math.random()-0.5)*S.shake}px,${(Math.random()-0.5)*S.shake}px)`;
-        } else if (canvas) {
-            canvas.style.transform = 'translate(0,0)';
-        }
-    }
-
-    function loop(now) {
-        if(!S.running) { 
-            drawBackground(now); updateParticles(); drawParticles(); 
-            S.animId = requestAnimationFrame(loop); return; 
-        }
-        if(!S.paused) {
-            const elapsed = (now-S.tStart)/1000;
-            if(S.phase==='reveal'&&now-S.tPhase>=S.cfg.reveal) {
-                S.phase='shuffle'; S.tPhase=now; S.tShuffle=0; showCorrect(false);
-                setStatus('SYS:// SHUFFLING','TIME:// '+elapsed.toFixed(1)+'s','ПЕРЕМЕШИВАНИЕ'); scheduleSwap();
-            }
-            if(S.phase==='trans') updateTransition(now);
-            if(S.phase==='orbit') updateOrbit();
-            if(S.shake>0.1) S.shake*=0.86; else S.shake=0;
-            updateParticles();
-            drawBackground(now); drawOrbitRings(now); drawCells(); drawParticles(); drawHUD(now);
-            setStatus(S.phase==='result'?'SYS:// RESULT':'SYS:// ONLINE','TIME:// '+elapsed.toFixed(1)+'s');
-        }
-        S.animId = requestAnimationFrame(loop);
-    }
-
-    function showCorrect(show) {
-        S.cells.forEach(c => {
-            if(c.isCorrect && show) { c.color = theme.correctBg; c.edge = theme.correctEdge; }
-            else if(!c.isCorrect || !show) { c.color = theme.cellBg; c.edge = theme.cellEdge; }
-        });
-    }
-
-    window.addEventListener('keydown',function(e) {
-        if(e.key==='Escape') { if(document.fullscreenElement) document.exitFullscreen(); return; }
-        if(e.key==='r'||e.key==='R'||e.key==='к'||e.key==='К') { restart(); return; }
-        if(e.key===' ') { 
-            e.preventDefault(); S.paused=!S.paused; 
-            if(bgm) { if(S.paused) bgm.pause(); else bgm.play().catch(()=>{}); }
-        }
-    });
-
-    resize(); setStatus('◆ SYS OFFLINE','⏱ 0.0s','LIMBO');
-    S.animId = requestAnimationFrame(loop);
-})();
+    </script>
+</body>
+</html>
