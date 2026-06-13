@@ -2,21 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>LIMBO</title>
+    <title>LIMBO - Memory Game</title>
     <style>
-        body { margin: 0; background: #0a0a14; color: white; font-family: sans-serif; overflow: hidden; }
+        body { margin: 0; background: #0a0a14; color: white; font-family: monospace; overflow: hidden; }
         canvas { display: block; }
         #menu-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10; }
-        button { padding: 15px 30px; font-size: 20px; cursor: pointer; background: transparent; color: #fff; border: 1px solid #fff; margin: 10px; transition: 0.3s; }
-        button:hover { background: #fff; color: #0a0a14; }
+        button { padding: 15px 30px; font-size: 20px; cursor: pointer; background: rgba(0,255,255,0.1); color: #0ff; border: 1px solid #0ff; margin: 10px; }
+        button:hover { background: #0ff; color: #0a0a14; }
         .hidden { display: none; }
-        #status-left, #status-right, #center-msg { position: absolute; pointer-events: none; font-family: monospace; z-index: 5; }
+        #status-left, #status-right, #center-msg { position: absolute; pointer-events: none; z-index: 5; color: #0ff; }
         #status-left { top: 20px; left: 20px; }
         #status-right { top: 20px; right: 20px; }
-        #center-msg { bottom: 20px; width: 100%; text-align: center; font-size: 1.5em; text-transform: uppercase; }
+        #center-msg { bottom: 20px; width: 100%; text-align: center; font-size: 1.5em; }
     </style>
 </head>
 <body>
+
+    <audio id="bgm" loop><source src="LIMBO.mp3" type="audio/mpeg"></audio>
 
     <div id="menu-overlay">
         <h1>LIMBO</h1>
@@ -34,53 +36,51 @@
     <script>
         const canvas = document.getElementById('c');
         const ctx = canvas.getContext('2d');
-        const menu = document.getElementById('menu-overlay');
+        const bgm = document.getElementById('bgm');
+        
+        const CONFIG = {
+            easy:   { reveal: 5000, beat: 600 },
+            normal: { reveal: 4000, beat: 350 },
+            limbo:  { reveal: 3000, beat: 200 }
+        };
 
-        // Игровое состояние
-        let game = { running: false, mode: 'normal' };
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.onresize = resize;
-        resize();
+        let S = { mode: 'normal', phase: 'menu' };
 
         function startGame(mode) {
-            game.mode = mode;
-            game.running = true;
-            menu.classList.add('hidden');
-            document.getElementById('center-msg').textContent = "РЕЖИМ " + mode.toUpperCase() + " АКТИВИРОВАН";
+            S.mode = mode;
+            S.phase = 'game';
+            document.getElementById('menu-overlay').classList.add('hidden');
+            
+            // Запуск музыки
+            bgm.play().catch(() => console.log("Музыка требует взаимодействия"));
+            
+            document.getElementById('center-msg').textContent = "РЕЖИМ: " + mode.toUpperCase();
+            
             requestAnimationFrame(loop);
         }
 
-        // Привязка кнопок
         document.getElementById('btn-easy').onclick = () => startGame('easy');
         document.getElementById('btn-normal').onclick = () => startGame('normal');
         document.getElementById('btn-limbo').onclick = () => startGame('limbo');
 
         function loop() {
-            if (!game.running) return;
-            
-            // Фон
+            if (S.phase !== 'game') return;
             ctx.fillStyle = '#0a0a14';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Здесь будет отрисовываться игровой процесс
-            ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2, 100, 0, Math.PI*2);
-            ctx.fill();
-
+            // Здесь логика отрисовки (ячейки, перемешивание)
+            ctx.fillStyle = "white";
+            ctx.fillText("ИГРАЕТ РЕЖИМ: " + S.mode, 50, 50);
+            
             requestAnimationFrame(loop);
         }
 
-        // Выход в меню по клавише R
         window.addEventListener('keydown', (e) => {
-            if(e.key.toLowerCase() === 'r') {
-                game.running = false;
-                menu.classList.remove('hidden');
-                document.getElementById('center-msg').textContent = "";
+            if(e.key === 'r') {
+                S.phase = 'menu';
+                document.getElementById('menu-overlay').classList.remove('hidden');
+                bgm.pause();
+                bgm.currentTime = 0;
             }
         });
     </script>
